@@ -8,6 +8,6 @@ services:
       - "139:139" 
       - "445:445"
     volumes:
-      - /mnt:/mnt
+      - mnt_dir:mnt_dir
     image: samba
     container_name: samba

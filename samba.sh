@@ -11,9 +11,7 @@ do
 	if [ ${yn,,} = "y" ]; then
 		echo "cp original_directory copy_directory"
 		read -p "original_directory:" o_dir
-		echo o_dir=$o_dir
 		read -p "copy_directory:" c_dir
-		echo c_dir=$c_dir
 		rm -rf $c_dir
 		cp -r $o_dir $c_dir
 		directory=$c_dir
@@ -30,6 +28,8 @@ cd $directory
 
 read -p "set your local ip (ex.192.168.xxx.):" ip
 read -p "set samba home path :" path
+sed -i s*mnt_dir*$path*g docker-compose.yml
+mkdir -p $path
 echo "hosts allow = $ip">>smb.conf
 echo ""
 
@@ -43,6 +43,7 @@ echo "echo $pass | passwd --stdin $name;\\">>Dockerfile
 echo "echo -e \"$pass\\n$pass\" | pdbedit -a -t -u \"$name\"">>Dockerfile
 echo "[$name]">>smb.conf
 echo "path = $path/$name">>smb.conf
+mkdir -p $path/$name
 echo "browsable = no">>smb.conf
 echo "read only = no">>smb.conf
 echo "create mode = 0744">>smb.conf
@@ -65,6 +66,7 @@ do
 	echo "echo -e \"$pass\\n$pass\" | pdbedit -a -t -u \"$name\"">>Dockerfile
 	echo "[$name]">>smb.conf
 	echo "path = $path/$name">>smb.conf
+	mkdir -p $path/$name
 	echo "browsable = no">>smb.conf
 	echo "read only = no">>smb.conf
 	echo "create mode = 0744">>smb.conf
