@@ -2,7 +2,6 @@
 
 echo ""
 echo `pwd`
-echo `ls /mnt`
 ls
 echo ""
 while :
