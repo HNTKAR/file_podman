@@ -1,0 +1,12 @@
+version: '2'
+services:
+  vsftpd_img:
+    build: .
+    ports:
+      - "21:21"
+      - "10000-10050:10000-10050"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - mnt_dir:mnt_dir
+    image: vsftp
+    container_name: vsftp
