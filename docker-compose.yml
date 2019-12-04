@@ -9,5 +9,3 @@ services:
       - "445:445"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-    image: samba
-    container_name: samba

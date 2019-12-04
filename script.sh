@@ -25,9 +25,20 @@ echo -e "\twins support = yes">>smb.conf
 awk -F "." '{print "\thosts allow = "$1"."$2"."$3".">>"smb.conf"}' general.log
 
 #set private setting
-cat setting_samba.log |awk -F ":" -f run.awk
+cat setting_samba.log |awk -F ":" -f script.awk
 wait
+
+#write files
+echo -e "\nENTRYPOINT [\"/usr/local/bin/run.sh\"]">>Dockerfile
+echo -e "    image: samba\n    container_name: samba">>docker-compose.yml
 
 #cleaning
 rm *.log
 echo "ok!!"
+
+#run container
+echo ""
+read -p "do you want to up this container ? (y/n):" yn
+if [ ${yn,,} = "y" ]; then
+	docker-compose up --build -d
+fi
