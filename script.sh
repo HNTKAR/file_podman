@@ -15,7 +15,7 @@ echo -e "[global]">smb.conf
 echo -e "\tworkgroup = WORKGROUP">>smb.conf
 echo -e "\tsecurity = user">>smb.conf
 echo -e "\tpassdb backend = tdbsam">>smb.conf
-echo -e "\tprinting = cupst">>smb.conf
+echo -e "\tprinting = cups">>smb.conf
 echo -e "\tprintcap name = cups">>smb.conf
 echo -e "\tload printers = no">>smb.conf
 echo -e "\tcups options = raw">>smb.conf
