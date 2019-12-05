@@ -1,8 +1,8 @@
 FROM centos
 MAINTAINER kusari-k
 
-RUN dnf -y upgrade passwd
-RUN dnf install -y samba
+RUN dnf -y upgrade
+RUN dnf install -y samba passwd
 RUN dnf clean all
 
 EXPOSE 139 445
