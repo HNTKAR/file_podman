@@ -36,6 +36,12 @@ echo -e "    image: samba\n    container_name: samba">>docker-compose.yml
 rm *.log
 echo "ok!!"
 
+#iptables
+iptables -I DOCKER-USER ! -s 192.168.0.0/16 -p tcp --sport 139 -j ACCEPT
+iptables -I DOCKER-USER ! -s 192.168.0.0/16 -p tcp --sport 445 -j ACCEPT
+iptables -I DOCKER-USER ! -s 192.168.0.0/16 -p udp --sport 137 -j ACCEPT
+iptables -I DOCKER-USER ! -s 192.168.0.0/16 -p udp --sport 138 -j ACCEPT
+
 #run container
 echo ""
 read -p "do you want to up this container ? (y/n):" yn
