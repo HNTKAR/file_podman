@@ -21,9 +21,6 @@ echo -e "\tload printers = no">>smb.conf
 echo -e "\tcups options = raw">>smb.conf
 echo -e "\twins support = yes">>smb.conf
 
-#set local IP
-#awk -F "." '{print "\thosts allow = "$1"."$2"."$3".">>"smb.conf"}' general.log
-
 #set private setting
 cat setting_samba.log |awk -F ":" -f script.awk
 wait
