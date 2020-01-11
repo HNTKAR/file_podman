@@ -8,12 +8,11 @@ RUN yum clean all
 EXPOSE 21
 EXPOSE 10000-10050
 
-RUN echo ts > /etc/vsftpd/chroot_list
 RUN mkdir /etc/vsftpd/vsftp_user_conf/
-
+RUN echo "" > /etc/vsftpd/chroot_list
 COPY vsftpd.conf /etc/vsftpd/
 RUN  chmod 600 /etc/vsftpd/vsftpd.conf
-COPY myapp.sh  /usr/local/bin/
-RUN  chmod 755 /usr/local/bin/myapp.sh
+COPY run.sh  /usr/local/bin/
+RUN  chmod 755 /usr/local/bin/run.sh
 
-ENTRYPOINT ["/usr/local/bin/myapp.sh"]
+####tst
