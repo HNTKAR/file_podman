@@ -5,10 +5,6 @@ sed -z s/.*#samba//  setting.txt |
 	\sed -z s/#.*// |
 	\sed -e /^$/d |
 	\sed '1d' >setting_samba.log
-sed -z s/.*#general// setting.txt |
-	\sed -z s/#.*// |
-	\sed -e /^$/d |
-	\sed '1d' >general.log
 
 #make default smb.conf
 echo -e "[global]">smb.conf
