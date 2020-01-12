@@ -7,5 +7,3 @@ services:
       - "10000-10050:10000-10050"
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro
-
-#tst

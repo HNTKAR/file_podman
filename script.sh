@@ -35,18 +35,16 @@ userlist_enable=YES
 echo -e """
 chroot_local_user=YES
 chroot_list_enable=YES
-chroot_list_file=/etc/vsftpd/chroot_list
 pasv_address=$global_ip
 rsa_cert_file=/etc/letsencrypt/live/ftp.$domain/fullchain.pem
 rsa_private_key_file=/etc/letsencrypt/live/ftp.$domain/privkey.pem
 ssl_enable=YES
-pasv_enable=YES
 pasv_min_port=10000
 pasv_max_port=10050
 require_ssl_reuse=NO
 user_config_dir=/etc/vsftpd/vsftp_user_conf
 allow_writeable_chroot=YES
-
+reverse_lookup_enable=NO
 """>>vsftpd.conf
 cat setting_vsftp.log |awk -F ":" -f script.awk
 wait
