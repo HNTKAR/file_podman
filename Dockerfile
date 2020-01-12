@@ -2,7 +2,7 @@ FROM centos
 MAINTAINER kusari-k
 
 RUN yum update -y
-RUN yum install -y vsftpd
+RUN yum install -y vsftpd passwd
 RUN yum clean all
 
 EXPOSE 21
