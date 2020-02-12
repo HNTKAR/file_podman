@@ -26,7 +26,7 @@ echo -e """networks:
   default:
     external:
       name: default_bridge
-"""
+""">>docker-compose.yml
 
 #write files
 echo -e "\nENTRYPOINT [\"/usr/local/bin/run.sh\"]">>Dockerfile
