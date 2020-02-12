@@ -2,6 +2,8 @@ version: '3.7'
 services:
   samba:
     build: .
+    container_name: samba
+    image: samba
     ports:
       - "137:137/udp"
       - "138:138/udp"
