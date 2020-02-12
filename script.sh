@@ -49,9 +49,15 @@ reverse_lookup_enable=NO
 cat setting_vsftp.log |awk -F ":" -f script.awk
 wait
 
+#set network setting
+echo -e """networks:
+  default:
+    external:
+      name: default_bridge
+""">>docker-compose.yml
+
 #write files
 echo -e "\nENTRYPOINT [\"/usr/local/bin/run.sh\"]">>Dockerfile
-echo -e "    image: vsftp\n    container_name: vsftp">>docker-compose.yml
 
 #cleaning
 rm *.log
