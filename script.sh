@@ -6,6 +6,26 @@ sed -z s/.*#samba//  setting.txt |
 	\sed -e /^$/d |
 	\sed '1d' >setting_samba.log
 
+sed -e "s/^##.*//g"  setting.txt |\
+       	sed -ze "s/.*=====general=====//g" \
+	-e  "s/=====.*//g" |\
+	sed -e /^$/d>general.log
+
+sed -e "s/^##.*//g"  setting.txt |\
+	sed -ze "s/.*=====samba=====//g" \
+	-e  "s/=====.*//g" |\
+	sed -ze "s/.*-----system data-----//g" \
+	-e "s/-----.*//g" |\
+	sed -e /^$/d>samba-system.log
+
+sed -e "s/^##.*//g"  setting.txt |\
+	sed -ze "s/.*=====samba=====//g" \
+	-e  "s/=====.*//g" |\
+	sed -ze "s/.*-----user data-----//g" \
+	-e "s/-----.*//g" |\
+	sed -e /^$/d>samba-user.log
+
+domain=$(cat general.log |grep domain|cut -f 2 -d ":")
 #make default smb.conf
 echo -e """[global]
 \tworkgroup = WORKGROUP
@@ -18,7 +38,7 @@ echo -e """[global]
 \twins support = yes""">>smb.conf
 
 #set private setting
-cat setting_samba.log |awk -F ":" -f script.awk
+cat samba-user.log |awk -F ":" -f script.awk
 wait
 
 #set network setting
