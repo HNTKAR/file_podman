@@ -10,7 +10,7 @@ export domain=$(grep ^domain setting.log|sed "s/.*://")
 read -p "do you want to up container ? (y/n):" yn
 if [ ${yn,,} = "y" ]; then
 	podman rmi -f samba
-	podman build -f Dockerfile -t samba:latest --build-arg DMAIN=$DOMAIN
+	podman build -f Dockerfile -t samba:latest --build-arg DOMAIN=$DOMAIN
 fi
 
 rm *.log
