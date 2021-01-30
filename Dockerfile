@@ -1,14 +1,18 @@
-FROM centos
+FROM centos:8
 MAINTAINER kusari-k
 
-RUN dnf -y upgrade
-RUN dnf install -y samba passwd
-RUN dnf clean all
+RUN sed -i -e "\$a fastestmirror=true" /etc/dnf/dnf.conf
+RUN dnf update -y && \
+	dnf install -y rsyslog samba passwd && \
+	dnf clean all
 
-EXPOSE 139 445
-EXPOSE 137/udp 138/udp
+#EXPOSE 139 445
+#EXPOSE 137/udp 138/udp
 
-COPY smb.conf /etc/samba/
-RUN  chmod 644 /etc/samba/smb.conf
-COPY run.sh  /usr/local/bin/
+COPY setting.log run.sh /usr/local/bin/
+
+RUN sed -i -e "/imjournal/ s/^/#/" \
+	-e "s/off/on/" /etc/rsyslog.conf && \
+
 RUN  chmod 755 /usr/local/bin/run.sh
+ENTRYPOINT ["/usr/local/bin/run.sh"]

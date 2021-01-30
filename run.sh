@@ -1,3 +1,3 @@
 #!/usr/bin/bash
-nmbd -D && smbd -F
+/usr/sbin/smbd --foreground --no-process-group
 tail -f /dev/null
