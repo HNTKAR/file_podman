@@ -13,6 +13,8 @@ RUN dnf update -y && \
 
 COPY setting.log run.sh /usr/local/bin/
 
+RUN mkdir -p -m 644 /conf/NetBIOS_log /conf/samba_log
+
 RUN sed -i -e "/imjournal/ s/^/#/" \
 	-e "s/off/on/" /etc/rsyslog.conf
 

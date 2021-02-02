@@ -10,7 +10,7 @@ domain:example.com
 ## _up container_
 
 ```
-sudo mkdir -p -m 777 /home/podman/lofile_pod/log /home/podman/lofile_pod/data
+sudo mkdir -p -m 777 /home/podman/lofile_pod/conf_and_log  /home/podman/lofile_pod/data
 ./script.sh
 sudo firewall-cmd --add-forward-port=port=139:proto=tcp:toport=10139 --permanent
 sudo firewall-cmd --add-forward-port=port=445:proto=tcp:toport=10445 --permanent
@@ -20,9 +20,8 @@ sudo firewall-cmd --reload
 cat tmp.service | \
 xargs -I {} systemctl --user disable {}
 podman pod create --replace=true -p 10139:139 -p 10445:445 -p 10137:137 -p 10138:138 -n lofile_pod
-podman run --replace=true -td --pod lofile_pod -v /home/podman/lofile_pod/log:/var/log -v /home/podman/lofile_pod/data:/home --name samba samba
+podman run --replace=true -td --pod lofile_pod -v /home/podman/lofile_pod/conf_and_log:/conf -v /home/podman/lofile_pod/data:/home --name samba samba
 mkdir -p $HOME/.config/systemd/user/ && \
-sudo loginctl enable-linger $(whoami) && \
 podman generate systemd --new -n --restart-policy=always lofile_pod -f >tmp.service && \
 cat tmp.service | \
 xargs -I {} cp {} -frp $HOME/.config/systemd/user && \
