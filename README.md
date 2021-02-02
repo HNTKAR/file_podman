@@ -1,13 +1,34 @@
-# Docker_samba
+# local file server Container
 
-run.sh  
-サービスの起動など最後に実行するもの
+## _setting file format_
 
-script.sh  
-docer fileなどを編集するためのbashで動くスクリプト
+```
+###samba###
+domain:example.com
+```
 
-script.awk  
-docer fileなどを編集するためのawkで動くscript.sh内で起動するスクリプト
+## _up container_
 
-Dockerfile  
-Dockrerfile本体
+```
+sudo mkdir -p -m 777 /home/podman/lofile_pod/log /home/podman/lofile_pod/data
+./script.sh
+sudo firewall-cmd --add-forward-port=port=139:proto=tcp:toport=10139 --permanent
+sudo firewall-cmd --add-forward-port=port=445:proto=tcp:toport=10445 --permanent
+sudo firewall-cmd --add-forward-port=port=137:proto=tcp:toport=10137 --permanent
+sudo firewall-cmd --add-forward-port=port=138:proto=tcp:toport=10138 --permanent
+sudo firewall-cmd --reload
+cat tmp.service | \
+xargs -I {} systemctl --user disable {}
+podman pod create --replace=true -p 10139:139 -p 10445:445 -p 10137:137 -p 10138:138 -n lofile_pod
+podman run --replace=true -td --pod lofile_pod -v /home/podman/lofile_pod/log:/var/log -v /home/podman/lofile_pod/data:/home --name samba samba
+mkdir -p $HOME/.config/systemd/user/ && \
+sudo loginctl enable-linger $(whoami) && \
+podman generate systemd --new -n --restart-policy=always lofile_pod -f >tmp.service && \
+cat tmp.service | \
+xargs -I {} cp {} -frp $HOME/.config/systemd/user && \
+cat tmp.service | \
+xargs -I {} systemctl --user enable {}
+podman pod rm -f lofile_pod
+systemctl --user restart pod-lofile_pod
+#podman exec -it samba bash
+```

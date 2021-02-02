@@ -1,3 +1,8 @@
 #!/usr/bin/bash
-/usr/sbin/smbd --foreground --no-process-group
-tail -f /dev/null
+
+#start rsyslog
+rsyslogd
+
+#start samba
+/usr/sbin/nmbd --daemon
+/usr/sbin/smbd --foreground
