@@ -24,7 +24,7 @@ pdbedit -L -s /conf/smb.conf|awk -F ':' '{print $1}'|xargs -n 1 useradd
 rsyslogd
 
 #start samba and NetBIOS
-#/usr/sbin/nmbd --daemon  -l /conf/NetBIOS_log
-/usr/sbin/smbd --foreground -d 1 --log-basename /conf/samba_log -s /conf/smb.conf 
+/usr/sbin/nmbd --daemon  -l /log/NetBIOS_log
+/usr/sbin/smbd --foreground --log-basename /log/samba_log -s /conf/smb.conf 
 
 tail -f /dev/null

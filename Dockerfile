@@ -6,9 +6,6 @@ RUN dnf update -y && \
 	dnf install -y rsyslog samba && \
 	dnf clean all
 
-#EXPOSE 139 445
-#EXPOSE 137/udp 138/udp
-
 COPY setting.log run.sh /usr/local/bin/
 
 RUN sed -i -e "/imjournal/ s/^/#/" \
