@@ -4,6 +4,9 @@
 
 ```
 ###samba###
+ssl_domain:example.com
+global_ip:203.0.113.1
+hostname:example.org
 user:USER1:PASSWORD1
 user:USER2:PASSWORD2
 user:USER3:PASSWORD3

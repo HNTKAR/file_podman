@@ -1,71 +1,26 @@
 #!/bin/bash
 
+cd $(dirname $0)
+
 #read setting file
-sed -z s/.*#general//  setting.txt |
-	\sed -z s/#.*// |
-	\sed -e /^$/d >general.log
-sed -z s/.*#vsftp//  setting.txt |
-	\sed -z s/#.*// |
-	\sed -e /^$/d |
-	\sed '1d' >setting_vsftp.log
-domain=$(cat general.log |grep your_domain|cut -f 2 -d ":")
-global_ip=$(cat general.log |grep your_global_ip|cut -f 2 -d ":")
+sed -z -e "s/.*##\+file#*//g" \
+	-e "s/##.\+//g" setting.txt > setting.log
 
-#echo general settings
-echo "domain=$domain"
-echo "global_ip=$global_ip"
-
-#make default smb.conf
-echo -e """
-anonymous_enable=NO
-local_enable=YES
-write_enable=YES
-local_umask=022
-dirmessage_enable=YES
-xferlog_enable=YES
-connect_from_port_20=YES
-xferlog_std_format=YES
-listen=YES
-listen_ipv6=NO
-pam_service_name=vsftpd
-userlist_enable=YES
-""">vsftpd.conf
-
-#set private setting
-echo -e """
-chroot_local_user=YES
-chroot_list_enable=YES
-pasv_address=$global_ip
-rsa_cert_file=/etc/letsencrypt/live/ftp.$domain/fullchain.pem
-rsa_private_key_file=/etc/letsencrypt/live/ftp.$domain/privkey.pem
-ssl_enable=YES
-pasv_min_port=10000
-pasv_max_port=10050
-require_ssl_reuse=NO
-user_config_dir=/etc/vsftpd/vsftp_user_conf
-allow_writeable_chroot=YES
-reverse_lookup_enable=NO
-""">>vsftpd.conf
-cat setting_vsftp.log |awk -F ":" -f script.awk
-wait
-
-#set network setting
-echo -e """networks:
-  default:
-    external:
-      name: default_bridge
-""">>docker-compose.yml
-
-#write files
-echo -e "\nENTRYPOINT [\"/usr/local/bin/run.sh\"]">>Dockerfile
-
-#cleaning
-rm *.log
-echo "ok!!"
+export SSL_DOMAIN=$(grep ^ssl_domain setting.log|sed "s/.*://")
+export USER_DOMAIN=$(grep ^hostname setting.log|sed "s/.*://")
+export GLOBAL_IP=$(grep ^global_ip setting.log|sed "s/.*://")
 
 #run container
-echo ""
-read -p "do you want to up this container ? (y/n):" yn
+read -p "do you want to up local file container ? (y/n):" yn
 if [ ${yn,,} = "y" ]; then
-	docker-compose up --build -d
+	podman rmi -f samba
+	podman build -f Dockerfile-samba -t samba
 fi
+
+read -p "do you want to up ftp container ? (y/n):" yn
+if [ ${yn,,} = "y" ]; then
+	podman rmi -f samba vsftp
+	podman build -f Dockerfile-vsftp -t vsftp --build-arg SSL_DOMAIN=$SSL_DOMAIN --build-arg USER_DOMAIN=$USER_DOMAIN --build-arg GLOBAL_IP=$GLOBAL_IP
+fi
+
+rm *.log
