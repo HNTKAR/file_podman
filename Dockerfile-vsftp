@@ -3,24 +3,39 @@ MAINTAINER kusari-k
 
 RUN sed -i -e "\$a fastestmirror=true" /etc/dnf/dnf.conf
 RUN dnf update -y && \
-	dnf install -y rsyslog samba && \
+	dnf install -y rsyslog vsftpd passwd && \
 	dnf clean all
 
 
-RUN echo "chroot_local_user=YES" >> /etc/vsftpd/vsftpd.conf && \
-	echo "chroot_list_enable=YES" >> /etc/vsftpd/vsftpd.conf && \
-	echo "pasv_address=$global_ip" >> /etc/vsftpd/vsftpd.conf && \
-	echo "rsa_cert_file=/etc/letsencrypt/live/ftp.$domain/fullchain.pem" >> /etc/vsftpd/vsftpd.conf && \
-	echo "rsa_private_key_file=/etc/letsencrypt/live/ftp.$domain/privkey.pem" >> /etc/vsftpd/vsftpd.conf && \
-	echo "ssl_enable=YES" >> /etc/vsftpd/vsftpd.conf && \
-	echo "pasv_min_port=10000" >> /etc/vsftpd/vsftpd.conf && \
-	echo "pasv_max_port=10050" >> /etc/vsftpd/vsftpd.conf && \
-	echo "require_ssl_reuse=NO" >> /etc/vsftpd/vsftpd.conf && \
-	echo "user_config_dir=/etc/vsftpd/vsftp_user_conf" >> /etc/vsftpd/vsftpd.conf && \
-	echo "allow_writeable_chroot=YES" >> /etc/vsftpd/vsftpd.conf && \
-	echo "reverse_lookup_enable=NO" >> /etc/vsftpd/vsftpd.conf
+RUN echo -e "chroot_local_user=YES" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "chroot_list_enable=YES" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "allow_writeable_chroot=YES" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "chroot_list_file=/conf/vsftpd.chroot_list" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "ssl_enable=YES" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "require_ssl_reuse=NO" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "rsa_cert_file=/etc/letsencrypt/live/ftp.$domain/fullchain.pem" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "rsa_private_key_file=/etc/letsencrypt/live/ftp.$domain/privkey.pem" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "pasv_address=$global_ip" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "pasv_min_port=10000" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "pasv_max_port=10050" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "better_stou=YES" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "use_localtime=YES" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "local_root=/usr/share/empty" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "user_config_dir=/conf/vsftp_user_conf" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "vsftpd_log_file=/conf/vsftpd.log" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "syslog_enable=YES" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "reverse_lookup_enable=NO" >> /etc/vsftpd/vsftpd.conf && \
+	sed -i -e "s/^#ascii/ascii/" /etc/vsftpd/vsftpd.conf
+RUN echo -e "log_ftp_protocol=YES" >> /etc/vsftpd/vsftpd.conf
+RUN mkdir -m 444 /usr/share/empty && \
+	echo -e "Setting is not completed ." > /usr/share/empty/README.txt && \
+	echo -e "Please set /conf/vsftp_user_conf/USER_NAME ." >> /usr/share/empty/README.txt && \
+	echo -e "You can't do anything ." >> /usr/share/empty/.message
 
 COPY setting.log run.sh /usr/local/bin/
+COPY letsencrypt /etc/letsencrypt/
+
+RUN chmod -R 777 /etc/letsencrypt
 
 RUN sed -i -e "/imjournal/ s/^/#/" \
 	-e "s/off/on/" \
@@ -29,6 +44,3 @@ RUN sed -i -e "/imjournal/ s/^/#/" \
 
 RUN  chmod 755 /usr/local/bin/run.sh
 ENTRYPOINT ["/usr/local/bin/run.sh"]
-
-#RUN mkdir /etc/vsftpd/vsftp_user_conf/
-#RUN echo "" > /etc/vsftpd/chroot_list

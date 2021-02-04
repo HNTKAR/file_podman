@@ -3,7 +3,6 @@
 mkdir -p -m 644 /log/NetBIOS_log /log/samba_log /log/log /conf/private /data
 if [ ! -e /conf/smb.conf ];then
 	cp /etc/samba/smb.conf /conf/smb.conf
-	sed -i -e "s/tdbsam/tdbsam\n\tprivate dir = \/conf\/private/" /conf/smb.conf
 fi
 
 if [ -e  /usr/local/bin/setting.log ];then
