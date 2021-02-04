@@ -10,7 +10,9 @@ export SSL_DOMAIN=$(grep ^ssl_domain setting.log|sed "s/.*://")
 export USER_DOMAIN=$(grep ^hostname setting.log|sed "s/.*://")
 export GLOBAL_IP=$(grep ^global_ip setting.log|sed "s/.*://")
 
-#run container
+cp -frp /home/podman/ssl_pod/letsencrypt .
+
+#build image
 read -p "do you want to up local file container ? (y/n):" yn
 if [ ${yn,,} = "y" ]; then
 	podman rmi -f samba

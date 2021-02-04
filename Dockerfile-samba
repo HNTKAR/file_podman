@@ -6,13 +6,13 @@ RUN dnf update -y && \
 	dnf install -y rsyslog samba && \
 	dnf clean all
 
-COPY setting.log run.sh /usr/local/bin/
-RUN sed -i -e "s/tdbsam/tdbsam\n\tprivate dir = \/conf\/private/" /conf/smb.conf
+COPY setting.log run-samba.sh /usr/local/bin/
+RUN sed -i -e "s/tdbsam/tdbsam\n\tprivate dir = \/conf\/private/" /etc/samba/smb.conf
 
 RUN sed -i -e "/imjournal/ s/^/#/" \
 	-e "s/off/on/" \
 	-e "s/var\/log/log\/log/g" /etc/rsyslog.conf
 
 
-RUN  chmod 755 /usr/local/bin/run.sh
-ENTRYPOINT ["/usr/local/bin/run.sh"]
+RUN  chmod 755 /usr/local/bin/run-samba.sh
+ENTRYPOINT ["/usr/local/bin/run-samba.sh"]
