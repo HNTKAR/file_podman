@@ -13,7 +13,7 @@ RUN dnf update -y && \
 
 RUN echo -e "chroot_local_user=YES" >> /etc/vsftpd/vsftpd.conf && \
 	echo -e "chroot_list_enable=YES" >> /etc/vsftpd/vsftpd.conf && \
-	echo -e "allow_writeable_chroot=YES" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "#allow_writeable_chroot=YES" >> /etc/vsftpd/vsftpd.conf && \
 	echo -e "chroot_list_file=/conf/vsftpd.chroot_list" >> /etc/vsftpd/vsftpd.conf && \
 	echo -e "ssl_enable=YES" >> /etc/vsftpd/vsftpd.conf && \
 	echo -e "require_ssl_reuse=NO" >> /etc/vsftpd/vsftpd.conf && \
