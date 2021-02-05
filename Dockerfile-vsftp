@@ -17,19 +17,21 @@ RUN echo -e "chroot_local_user=YES" >> /etc/vsftpd/vsftpd.conf && \
 	echo -e "chroot_list_file=/conf/vsftpd.chroot_list" >> /etc/vsftpd/vsftpd.conf && \
 	echo -e "ssl_enable=YES" >> /etc/vsftpd/vsftpd.conf && \
 	echo -e "require_ssl_reuse=NO" >> /etc/vsftpd/vsftpd.conf && \
-	echo -e "rsa_cert_file=/etc/letsencrypt/live/ftp.$domain/fullchain.pem" >> /etc/vsftpd/vsftpd.conf && \
-	echo -e "rsa_private_key_file=/etc/letsencrypt/live/ftp.$domain/privkey.pem" >> /etc/vsftpd/vsftpd.conf && \
-	echo -e "pasv_address=$global_ip" >> /etc/vsftpd/vsftpd.conf && \
-	echo -e "pasv_min_port=10000" >> /etc/vsftpd/vsftpd.conf && \
-	echo -e "pasv_max_port=10050" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "rsa_cert_file=/etc/letsencrypt/live/$SSL_DOMAIN/fullchain.pem" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "rsa_private_key_file=/etc/letsencrypt/live/$SSL_DOMAIN/privkey.pem" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "pasv_address=$GLOBAL_IP" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "pasv_min_port=20000" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "pasv_max_port=20050" >> /etc/vsftpd/vsftpd.conf && \
 	echo -e "better_stou=YES" >> /etc/vsftpd/vsftpd.conf && \
 	echo -e "use_localtime=YES" >> /etc/vsftpd/vsftpd.conf && \
 	echo -e "local_root=/usr/share/empty" >> /etc/vsftpd/vsftpd.conf && \
 	echo -e "user_config_dir=/conf/vsftp_user_conf" >> /etc/vsftpd/vsftpd.conf && \
-	echo -e "vsftpd_log_file=/conf/vsftpd.log" >> /etc/vsftpd/vsftpd.conf && \
+	echo -e "vsftpd_log_file=/log/vsftpd.log" >> /etc/vsftpd/vsftpd.conf && \
 	echo -e "syslog_enable=YES" >> /etc/vsftpd/vsftpd.conf && \
 	echo -e "reverse_lookup_enable=NO" >> /etc/vsftpd/vsftpd.conf && \
-	sed -i -e "s/^#ascii/ascii/" /etc/vsftpd/vsftpd.conf
+	sed -i -e "s/^#ascii/ascii/" \
+		-e "/listen=/ s/NO/YES/" \
+		-e "/listen_ipv6=/ s/YES/NO/" /etc/vsftpd/vsftpd.conf
 RUN echo -e "log_ftp_protocol=YES" >> /etc/vsftpd/vsftpd.conf
 RUN mkdir -p -m 444 /usr/share/empty && \
 	echo -e "Setting is not completed ." > /usr/share/empty/README.txt && \

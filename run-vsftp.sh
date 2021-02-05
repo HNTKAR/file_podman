@@ -17,6 +17,9 @@ if [ -e  /usr/local/bin/setting.log ];then
 	rm /usr/local/bin/setting.log
 fi
 
+#start rsyslog
+rsyslogd
 
+#start vsftp
 /usr/sbin/vsftpd /conf/vsftpd.conf
 tail -f /dev/null

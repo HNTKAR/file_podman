@@ -19,9 +19,9 @@ if [ ${yn,,} = "y" ]; then
 	podman build -f Dockerfile-samba -t samba
 fi
 
-read -p "do you want to up ftp container ? (y/n):" yn
+read -p "do you want to up global file container ? (y/n):" yn
 if [ ${yn,,} = "y" ]; then
-	podman rmi -f samba vsftp
+	podman rmi -f vsftp
 	podman build -f Dockerfile-vsftp -t vsftp --build-arg SSL_DOMAIN=$SSL_DOMAIN --build-arg USER_DOMAIN=$USER_DOMAIN --build-arg GLOBAL_IP=$GLOBAL_IP
 fi
 
