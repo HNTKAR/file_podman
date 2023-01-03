@@ -1,18 +1,12 @@
-FROM centos:8
-MAINTAINER kusari-k
+FROM rockylinux:9
 
-RUN sed -i -e "\$a fastestmirror=true" /etc/dnf/dnf.conf
+ARG CONFIG_FILE="smb.conf"
 RUN dnf update -y && \
-	dnf install -y rsyslog samba && \
+	dnf install -y samba && \
 	dnf clean all
 
-COPY setting.log run-samba.sh /usr/local/bin/
-RUN sed -i -e "s/tdbsam/tdbsam\n\tprivate dir = \/conf\/private/" /etc/samba/smb.conf
+COPY ["${CONFIG_FILE}", "/etc/samba/smb-user.conf"]
+COPY run-samba.sh user-add.sh /usr/local/bin/
+RUN  chmod 755 -R /usr/local/bin
 
-RUN sed -i -e "/imjournal/ s/^/#/" \
-	-e "s/off/on/" \
-	-e "s/var\/log/log\/log/g" /etc/rsyslog.conf
-
-
-RUN  chmod 755 /usr/local/bin/run-samba.sh
 ENTRYPOINT ["/usr/local/bin/run-samba.sh"]
