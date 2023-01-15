@@ -24,7 +24,7 @@ sudo podman volume create file_samba_conf
 sudo podman volume create file_samba_log
 
 # イメージのビルド
-sudo podman build --build-arg CONFIG_FILE=Config/smb.conf --tag samba:1.0 --file Dockerfile-samba .
+sudo podman build --build-arg CONFIG_FILE=Config/smb.conf --tag samba:1.0 --file samba/Dockerfile .
 
 #ポッドの作成
 sudo podman pod create --publish 138:138/udp --publish 139:139/tcp --publish 445:445/tcp --name file
