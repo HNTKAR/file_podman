@@ -6,7 +6,7 @@ RUN dnf update -y && \
 	dnf clean all
 
 COPY ["${CONFIG_FILE}", "/etc/samba/smb-user.conf"]
-COPY samba/run-samba.sh samba/user-add.sh /usr/local/bin/
+COPY samba/run.sh samba/user-add.sh /usr/local/bin/
 RUN  chmod 755 -R /usr/local/bin
 
-ENTRYPOINT ["/usr/local/bin/run-samba.sh"]
+ENTRYPOINT ["/usr/local/bin/run.sh"]
