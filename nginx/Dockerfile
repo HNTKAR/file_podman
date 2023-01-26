@@ -1,14 +1,12 @@
 FROM rockylinux:9
 
 ARG CONFIG_FILE="nginx.conf"
-ARG NEXTCLOUD_DATA="https://download.nextcloud.com/server/releases/latest.tar.bz2"
 
-VOLUME [ "/var/opt/remi/php82/run/php-fpm" ]
+VOLUME [ "/var/opt/remi/php81/run/php-fpm" ]
 COPY ["nginx/nginx.repo","/etc/yum.repos.d/"]
 RUN dnf -y update && \
     dnf -y install nginx
 
-ADD ["${NEXTCLOUD_DATA}","/var/www"]
 ADD ["nginx/nginx_user.conf","/etc/nginx"]
 ADD ["${CONFIG_FILE}","/etc/nginx/conf_user.d/"]
 COPY ["nginx/run.sh", "/usr/local/bin/"]
