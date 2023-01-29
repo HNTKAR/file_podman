@@ -2,6 +2,9 @@ FROM rockylinux:9
 
 # ARG CONFIG_FILE="nginx.conf"
 
+RUN unlink /etc/localtime && \
+    ln -s /usr/share/zoneinfo/Japan /etc/localtime
+
 # ENV PATH=$PATH:/opt/remi/php82/root/bin
 RUN dnf -y update && \
     # dnf -y install php

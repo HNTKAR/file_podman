@@ -2,6 +2,9 @@ FROM rockylinux:9
 
 ARG CONFIG_FILE="nginx.conf"
 
+RUN unlink /etc/localtime && \
+    ln -s /usr/share/zoneinfo/Japan /etc/localtime
+
 VOLUME [ "/var/opt/remi/php81/run/php-fpm" ]
 COPY ["nginx/nginx.repo","/etc/yum.repos.d/"]
 RUN dnf -y update && \
