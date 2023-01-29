@@ -6,6 +6,7 @@ RUN unlink /etc/localtime && \
     ln -s /usr/share/zoneinfo/Japan /etc/localtime
 
 VOLUME [ "/run/php" ]
+VOLUME [ "/var/lib/mysql" ]
 COPY ["nginx/nginx.repo","/etc/yum.repos.d/"]
 RUN dnf -y update && \
     dnf -y install nginx
