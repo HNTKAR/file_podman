@@ -1,10 +1,9 @@
 #!/usr/bin/bash
 
-chown -R mysql:mysql /var/lib/mysql
-rm -fr /var/lib/mysql/mysql.sock
+rm -fr /sock/mysql.sock
 
 if [ ! -d /data/performance_schema ];then
-    sudo -u mysql mysql_install_db
+    mysql_install_db
 fi
 
-sudo -u mysql mariadbd  
+mariadbd --user root 
