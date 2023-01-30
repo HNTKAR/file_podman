@@ -6,8 +6,7 @@ RUN unlink /etc/localtime && \
 RUN dnf -y update && \
     dnf -y install mariadb-server
 
-RUN mkdir /data && \
-    chmod 777 -R /data && \
+RUN mkdir /database /sock && \
     sed -i -e "s@datadir=.*@datadir=/database@g" \
         -e "s@socket=.*@socket=/sock/mysql.sock@g" /etc/my.cnf.d/mariadb-server.cnf 
 
