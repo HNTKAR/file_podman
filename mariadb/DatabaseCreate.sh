@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
-USER=nextcloud_user_b
-DATABASE=nextcloud_b
+USER=nextcloud
+DATABASE=nextcloud_db
 PASS=${PASS:-password}
 echo $PASS > pass
 
