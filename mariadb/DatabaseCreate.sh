@@ -1,10 +1,13 @@
 #!/usr/bin/bash
 
-PASSWOED=$1
-USER=nextcloud
-DATABASE=nextcloud
+USER=nextcloud_user_b
+DATABASE=nextcloud_b
+PASS=${PASS:-password}
+echo $PASS > pass
 
-mysql -S /sock/mysql.sock -e "CREATE DATABASE nextcloud DEFAULT CHARACTER SET utf8mb4"
-mysql -S /sock/mysql.sock -e "CREATE USER 'nextcloud'@'localhost' IDENTIFIED BY 'nextcloud';"
-mysql -S /sock/mysql.sock -e "GRANT ALL ON nextcloud.* TO 'nextcloud'@'localhost';"
-mysql -S /sock/mysql.sock -e "SHOW GRANTS FOR 'nextcloud'@'localhost';"
+if [ $(mysql -S /sock/mysql.sock -e "show databases"|grep $DATABASE|wc -l) -eq 0 ];then
+    mysql -S /sock/mysql.sock -e "CREATE DATABASE $DATABASE DEFAULT CHARACTER SET utf8mb4"
+    mysql -S /sock/mysql.sock -e "CREATE USER $USER@localhost IDENTIFIED BY '$PASS';"
+    mysql -S /sock/mysql.sock -e "GRANT ALL ON $DATABASE.* TO $USER@localhost;"
+    mysql -S /sock/mysql.sock -e "SHOW GRANTS FOR $USER@'localhost';"
+fi

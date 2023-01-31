@@ -48,7 +48,7 @@ sudo podman volume create file_samba_log
 podman build --build-arg CONFIG_FILE=Config/nextcloud.conf --build-arg NEXTCLOUD_DATA=Config/latest.tar.bz2 --tag nginx:1.0 --file nginx/Dockerfile .
 
 # ポッドの作成
-podman pod create --replace --publish 1180:80/tcp --publish 11443:443/tcp --name file
+podman pod create --replace --publish 11080:11080/tcp --publish 11443:11443/tcp --name file
 
 # コンテナの実行
 podman run --detach --replace --mount type=volume,source=certbot_dir,destination=/etc/ssl --mount type=bind,source=/home/podman/file,destination=/data --pod file --name nginx nginx:1.0
