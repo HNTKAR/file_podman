@@ -54,18 +54,34 @@ podman pod create --replace --publish 11080:11080/tcp --publish 11443:11443/tcp 
 podman run --detach --replace --mount type=volume,source=certbot_dir,destination=/etc/ssl --mount type=bind,source=/home/podman/file,destination=/data --pod file --name nginx nginx:1.0
 ```
 # 自動起動の設定
-```
+```sh
+# rootコンテナの場合
 sudo podman generate systemd -f -n --new --restart-policy=always file >tmp.service
 cat tmp.service | \
 xargs -I {} sudo cp {} -frp /etc/systemd/system/
 sed -e "s/.*\///g" tmp.service | \
 grep pod | \
 xargs -n 1 sudo systemctl --now enable
+
+# rootlessコンテナの場合
+podman generate systemd -f -n --new --restart-policy=always file >tmp.service
+mkdir -p ~/.config/systemd/user/
+cat tmp.service | \
+xargs -I {} cp {} -frp ~/.config/systemd/user/
+sed -e "s/.*\///g" tmp.service | \
+grep pod | \
+xargs -n 1 systemctl --user enable --now
 ```
 
 # 自動起動解除
-```
+```sh
+# rootコンテナの場合
 sed -e "s/.*\///g" tmp.service | \
 grep pod | \
-xargs -n 1 sudo systemctl --now disable
+xargs -n 1 sudo systemctl --user disable --now
+
+# rootlessコンテナの場合
+sed -e "s/.*\///g" tmp.service | \
+grep pod | \
+xargs -n 1 systemctl --user disable --now
 ```
