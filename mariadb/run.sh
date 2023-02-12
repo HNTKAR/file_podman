@@ -6,4 +6,4 @@ if [ ! -d /data/performance_schema ];then
     mysql_install_db
 fi
 
-mariadbd --user root 
+exec mariadbd --user root 

@@ -1,4 +1,4 @@
 #!/usr/bin/bash
 
 postfix start
-tail -f /dev/null
+exec tail -f /dev/null

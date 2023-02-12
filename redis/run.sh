@@ -11,4 +11,4 @@ if [ $(grep defarul_phone_region /var/www/nextcloud/nextcloud/config/config.php 
 fi
 
 rm -fr /sock/redis.sock 
-/usr/bin/redis-server /etc/redis/redis.conf --daemonize no 
+exec /usr/bin/redis-server /etc/redis/redis.conf --daemonize no 

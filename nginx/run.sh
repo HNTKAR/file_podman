@@ -10,4 +10,4 @@ if [ $(grep defarul_phone_region /var/www/nextcloud/nextcloud/config/config.php 
     sed -i.old -e "/^\$CONFIG/a 'default_phone_region' =>'JP'," /var/www/nextcloud/nextcloud/config/config.php
 fi
 
-nginx -c /etc/nginx/nginx_user.conf
+exec nginx -c /etc/nginx/nginx_user.conf
