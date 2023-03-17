@@ -6,7 +6,7 @@ echo "<?php
 );" >/var/www/nextcloud/nextcloud/config/config.php
 fi
 
-if [ $(grep defarul_phone_region /var/www/nextcloud/nextcloud/config/config.php |wc -l) -eq 0 ];then
+if [ $(grep Memcache /var/www/nextcloud/nextcloud/config/config.php |wc -l) -eq 0 ];then
     sed -i.old -e "/^\$CONFIG/a 'memcache.local' => '\\\OC\\\Memcache\\\Redis',\n'memcache.distributed' => '\\\OC\\\Memcache\\\Redis',\n'redis' => [\n'host'     => '/sock/redis.sock',\n'port'     => 0,\n]," /var/www/nextcloud/nextcloud/config/config.php
 fi
 

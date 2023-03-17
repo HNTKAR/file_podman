@@ -6,7 +6,7 @@ echo "<?php
 );" >/var/www/nextcloud/nextcloud/config/config.php
 fi
 
-if [ $(grep defarul_phone_region /var/www/nextcloud/nextcloud/config/config.php |wc -l) -eq 0 ];then
+if [ $(grep default_phone_region /var/www/nextcloud/nextcloud/config/config.php |wc -l) -eq 0 ];then
     sed -i.old -e "/^\$CONFIG/a 'default_phone_region' =>'JP'," /var/www/nextcloud/nextcloud/config/config.php
 fi
 
