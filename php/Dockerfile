@@ -20,7 +20,8 @@ RUN sed -i.old -e "s@;access.log =.*@;access.log = log/\$pool.access.log@g" \
     -e "s@listen =.*@listen = /sock/www.sock@g" /etc/opt/remi/php${PHP_VER}/php-fpm.d/www.conf
 RUN sed -i.old -e "s@pdo_mysql.default_socket=@pdo_mysql.default_socket = /sock/mysql.sock@g" \
     -e "s/memory_limit =.*/memory_limit =512M/g" /etc/opt/remi/php${PHP_VER}/php.ini
-RUN sed -i.old -e "s/interned_strings_buffer.*/interned_strings_buffer=128/g" /etc/opt/remi/php${PHP_VER}/php.d/10-opcache.ini 
+RUN sed -i.old -e "s/interned_strings_buffer.*/interned_strings_buffer=32/g" \
+    -e "/interned_strings_buffer/ s/^;//g" /etc/opt/remi/php${PHP_VER}/php.d/10-opcache.ini 
 RUN echo "*/5 * * * * php${PHP_VER} /var/www/nextcloud/nextcloud/cron.php" |crontab -
 # RUN echo "[apcu]" >> /etc/opt/remi/php${PHP_VER}/php.ini
 # RUN echo "apc.enable_cli = 1" >> /etc/opt/remi/php${PHP_VER}/php.ini
