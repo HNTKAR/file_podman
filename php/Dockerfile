@@ -1,6 +1,6 @@
 FROM rockylinux:9
 
-ARG PHP_VER=81
+ARG PHP_VER=82
 ENV PHP_VER=${PHP_VER}
 
 RUN unlink /etc/localtime && \
