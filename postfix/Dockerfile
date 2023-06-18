@@ -5,6 +5,7 @@ RUN unlink /etc/localtime && \
 
 RUN dnf -y update && \
     dnf -y install postfix
+RUN sed -i "\$a maillog_file = /dev/stdout" /etc/postfix/main.cf
 
 COPY ["postfix/run.sh", "/usr/local/bin/"]
 
