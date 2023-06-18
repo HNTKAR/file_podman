@@ -5,7 +5,9 @@ RUN unlink /etc/localtime && \
 
 RUN dnf -y update && \
     dnf -y install postfix
-RUN sed -i "\$a maillog_file = /dev/stdout" /etc/postfix/main.cf
+RUN sed -i -e "\$a maillog_file = /dev/stdout" \
+    -e "s/smtp_tls_security_level.*/smtp_tls_security_level = none/g" \
+    -e "s/smtpd_tls_security_level.*/smtpd_tls_security_level = none/g" /etc/postfix/main.cf
 
 COPY ["postfix/run.sh", "/usr/local/bin/"]
 
