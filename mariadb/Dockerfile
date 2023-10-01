@@ -1,18 +1,25 @@
-FROM rockylinux:9
+FROM mariadb:10.6
 
-ARG DATABASE_PASSWORD=password
-ENV PASS=${DATABASE_PASSWORD}
+ENV MARIADB_ROOT_PASSWORD="password"
+COPY ["mariadb/my.cnf","/etc/mysql/"]
 
-RUN unlink /etc/localtime && \
-    ln -s /usr/share/zoneinfo/Japan /etc/localtime
+RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 
-RUN dnf -y update && \
-    dnf -y install mariadb-server
+CMD [ "--socket" ,"/sock/mysql.sock"]
 
-RUN mkdir /database /sock && \
-    sed -i.old -e "s@datadir=.*@datadir=/database@g" \
-        -e "s@socket=.*@socket=/sock/mysql.sock@g" /etc/my.cnf.d/mariadb-server.cnf 
+# ARG DATABASE_PASSWORD=password
+# ENV PASS=${DATABASE_PASSWORD}
 
-COPY ["mariadb/run.sh", "mariadb/DatabaseCreate.sh", "/usr/local/bin/"]
-RUN chmod 777 -R /usr/local/bin/ 
-ENTRYPOINT ["/usr/local/bin/run.sh"]
+# RUN unlink /etc/localtime && \
+#     ln -s /usr/share/zoneinfo/Japan /etc/localtime
+
+# RUN dnf -y update && \
+#     dnf -y install mariadb-server
+
+# RUN mkdir /database /sock && \
+#     sed -i.old -e "s@datadir=.*@datadir=/database@g" \
+#         -e "s@socket=.*@socket=/sock/mysql.sock@g" /etc/my.cnf.d/mariadb-server.cnf 
+
+# COPY ["mariadb/run.sh", "mariadb/DatabaseCreate.sh", "/usr/local/bin/"]
+# RUN chmod 777 -R /usr/local/bin/ 
+# ENTRYPOINT ["/usr/local/bin/run.sh"]

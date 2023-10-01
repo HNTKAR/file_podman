@@ -1,0 +1,9 @@
+  'default_phone_region' => 'JP',
+  'memcache.local' => '\OC\Memcache\APCu',
+  'memcache.locking' => '\OC\Memcache\Redis',
+  'memcache.distributed' => '\OC\Memcache\Redis',
+  'memcache.local' => '\OC\Memcache\Redis',
+  'redis' => [
+     'host'     => '/sock/redis.sock',
+     'port'     => 0,
+  ],
