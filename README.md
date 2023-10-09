@@ -118,7 +118,7 @@ podman run --detach --replace --volumes-from file-nginx --pod file --name file-i
 ## 自動起動の設定
 ```sh
 # rootコンテナの場合
-sudo podman generate systemd -f -n --new --restart-policy=always file >tmp.service
+sudo podman generate systemd -f -n --new --restart-policy=on-failure file >tmp.service
 cat tmp.service | \
 xargs -I {} sudo cp {} -frp /etc/systemd/system/
 sed -e "s/.*\///g" tmp.service | \
@@ -126,7 +126,7 @@ grep pod | \
 xargs -n 1 sudo systemctl --now enable
 
 # rootlessコンテナの場合
-podman generate systemd -f -n --new --restart-policy=always file >tmp.service
+podman generate systemd -f -n --new --restart-policy=on-failure file >tmp.service
 mkdir -p ~/.config/systemd/user/
 cat tmp.service | \
 xargs -I {} cp {} -frp ~/.config/systemd/user/

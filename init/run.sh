@@ -18,7 +18,7 @@ num=$(
         head -n 1
 )
 
-if [ $(mysql -u${user} -p${pass} -S /sock/mysql.sock -e"show databases;" | grep nextcloud_db | wl -l) -eq 0 ]; then
+if [ $(mysql -u${user} -p${pass} -S /sock/mysql.sock -e"show databases;" | grep nextcloud_db | wc -l) -eq 0 ]; then
     mysql -u${user} -p${pass} -S /sock/mysql.sock </usr/local/src/nextcloud.sql
 fi
 
