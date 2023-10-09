@@ -83,7 +83,7 @@ bunzip2 -k -c $HOME/latest.tar.bz2 |
 podman volume create file_mariadb_dir
 
 # ポッドの作成
-podman pod create --replace --publish 11080:11080 --publish 11443:11443 --network=slirp4netns:port_handler=slirp4netns --name file
+podman pod create --replace --publish 80:80 --publish 443:443 --network=slirp4netns:port_handler=slirp4netns --name file
 
 #nginx
 podman build --tag file-nginx:$TagName --file nginx/Dockerfile .
@@ -109,6 +109,11 @@ podman run --detach --replace --pod file --name file-postfix file-postfix:$TagNa
 podman build --tag file-init:$TagName --file init/Dockerfile .
 podman run --detach --replace --volumes-from file-nginx --pod file --name file-init file-init:$TagName
 ```
+
+## nextcloudの初期設定
+1. `https://192.168.100.100`にアクセス
+1. 以下の通り設定  
+  ![setting](img/install.png)
 
 ## 自動起動の設定
 ```sh
