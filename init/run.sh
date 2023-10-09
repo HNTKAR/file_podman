@@ -1,5 +1,8 @@
 #!/bin/sh
 
+pass="password"
+user="root"
+
 # config.php の生成まで待機
 while [ ! -e "/var/www/nextcloud/config/config.php" ]; do
     sleep 1
@@ -9,9 +12,11 @@ done
 while [ ! -e "/sock/mysql.sock" ]; do
     sleep 1
 done
+while [ $(mysql -u${user} -p${pass} -S /sock/mysql.sock -e"show databases;" | grep mysql | wc -l) -eq 0 ]; do
+    sleep 1
+done
 
-pass="password"
-user="root"
+
 num=$(
     grep ^\$CONFIG -n /var/www/nextcloud/config/config.php |
         sed "s/:.*//g" |
