@@ -1,22 +1,26 @@
-FROM php:8.2-fpm
+FROM php:8.2-fpm-alpine
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 COPY ["php/php-fpm.conf","${PHP_INI_DIR}-fpm.d/zzz-php-fpm.conf"]
 COPY ["php/user.ini","${PHP_INI_DIR}/conf.d/"]
 
-RUN apt -y update && \
-    apt -y install \
-        ffmpeg \
-        libzip-dev \
-        libpng-dev \
-        libbz2-dev \
-        libicu-dev \
-        libc-client-dev \
-        libgmp-dev \
-        libsmbclient-dev \
-        libmagickwand-dev \
-        libkrb5-dev && \
-    apt clean
+RUN apk update && \
+    apk add \
+    autoconf \
+    alpine-sdk \
+    ffmpeg \
+    libzip-dev \
+    icu-dev \
+    gmp-dev \
+    samba-dev \
+    imagemagick-dev \
+    krb5-dev \
+    imap-dev \
+    openssl-dev \
+    freetype-dev \
+    zlib-dev \
+    libpng-dev && \
+    apk cache clean
 RUN pecl install smbclient apcu redis imagick && \
     docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
     docker-php-ext-configure gd --with-freetype && \

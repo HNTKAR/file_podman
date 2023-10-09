@@ -1,4 +1,4 @@
-FROM nginx:mainline
+FROM nginx:mainline-alpine
 
 ARG CONFIG_FILE="https://raw.githubusercontent.com/nextcloud/documentation/master/admin_manual/installation/nginx-root.conf.sample"
 VOLUME [ "/sock" ]
