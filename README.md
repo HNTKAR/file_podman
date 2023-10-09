@@ -3,56 +3,61 @@
 |名称|値|
 |:-:|:-:|
 |ポッド名|file|
-|コンテナ名|samba|
-|イメージ名:バージョン|samba:1.0|
-|sambaの設定ファイル|Config/smb.conf|
-|sambaで共有したいフォルダ|/home/podman/file|
-
-samba-serverの実行に必要な権限は下記の通りである。
-
-- CAP_DAC_OVERRIDE
-- CAP_NET_BIND_SERVICE
-- CAP_SETGID
-- CAP_SETUID
+|localtime|Asia/Tokyo|
+|DB root password|password|
+|nextcloud DB name|nextcloud_db|
+|nextcloud DB user|nextcloud_user|
+|nextcloud DB password|nextcloud_password|
 
 # 実行スクリプト
 
-## samba
+## はじめに
+nextcloud本体のファイルをダウンロードする。
+```bash
+curl https://download.nextcloud.com/server/releases/latest.tar.bz2 -o $HOME/latest.tar.bz2
+```
 
+## 各種コンテナの起動
 ```bash
 cd file_podman
 
-# ボリュームの作成
-sudo podman volume create file_samba_conf
-sudo podman volume create file_samba_log
-
-# イメージのビルド
-sudo podman build --build-arg CONFIG_FILE=Config/smb.conf --tag samba:1.0 --file samba/Dockerfile .
-
-# ポッドの作成
-sudo podman pod create --publish 138:138/udp --publish 139:139/tcp --publish 445:445/tcp --name file
-
-# コンテナの実行
-sudo podman run --detach --replace --mount type=bind,source=/home/podman/file,destination=/data --mount type=volume,source=file_samba_conf,destination=/var/lib/samba/private --mount type=volume,source=file_samba_log,destination=/var/log/samba --pod file --name samba samba:1.0
-```
-
-## nginx
-```bash
-cd file_podman
+# 変数の設定
+ContainerBranch="alpine"
 
 # ボリュームの作成
-sudo podman volume create file_samba_conf
-sudo podman volume create file_samba_log
-
-# イメージのビルド
-podman build --build-arg CONFIG_FILE=Config/nextcloud.conf --build-arg NEXTCLOUD_DATA=Config/latest.tar.bz2 --tag nginx:1.0 --file nginx/Dockerfile .
+podman volume create file_nginx_dir
+bunzip2 -k -c $HOME/latest.tar.bz2 |
+    podman volume import file_nginx_dir -
+podman volume create file_mariadb_dir
 
 # ポッドの作成
-podman pod create --replace --publish 11080:11080/tcp --publish 11443:11443/tcp --name file
+podman pod create --replace --publish 11080:11080 --publish 11443:11443 --network=slirp4netns:port_handler=slirp4netns --name file
 
-# コンテナの実行
-podman run --detach --replace --mount type=volume,source=certbot_dir,destination=/etc/ssl --mount type=bind,source=/home/podman/file,destination=/data --pod file --name nginx nginx:1.0
+#nginx
+podman build --build-arg CONFIG_FILE=Config/nextcloud.conf --tag file-nginx:$ContainerBranch --file nginx/Dockerfile .
+podman run --detach --replace --mount type=volume,source=file_nginx_dir,destination=/var/www --pod file --name file-nginx file-nginx:$ContainerBranch
+
+# php
+podman build --tag file-php:$ContainerBranch --file php/Dockerfile .
+podman run --detach --replace --volumes-from file-nginx --pod file --name file-php file-php:$ContainerBranch
+
+# mariadb
+podman build --tag file-mariadb:$ContainerBranch --file mariadb/Dockerfile .
+podman run --detach --replace --volumes-from file-nginx --mount type=volume,source=file_mariadb_dir,destination=/var/lib/mysql --pod file --name file-mariadb file-mariadb:$ContainerBranch
+
+# redis
+podman build --tag file-redis:$ContainerBranch --file redis/Dockerfile .
+podman run --detach --replace --volumes-from file-nginx --pod file --name file-redis file-redis:$ContainerBranch
+
+# postfix
+podman build --tag file-postfix:$ContainerBranch --file postfix/Dockerfile .
+podman run --detach --replace --pod file --name file-postfix file-postfix:$ContainerBranch
+
+# initializer
+podman build --tag file-init:$ContainerBranch --file init/Dockerfile .
+podman run --detach --replace --volumes-from file-nginx --pod file --name file-init file-init:$ContainerBranch
 ```
+
 # 自動起動の設定
 ```sh
 # rootコンテナの場合
