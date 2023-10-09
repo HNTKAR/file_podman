@@ -1,4 +1,5 @@
-FROM docker.io/library/nginx:mainline
+FROM nginx:mainline
+
 ARG CONFIG_FILE="Config/smb.conf"
 VOLUME [ "/sock" ]
 

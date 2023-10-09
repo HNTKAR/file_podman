@@ -11,5 +11,3 @@ COPY ["init/run.sh","/usr/local/bin/"]
 RUN chmod 777 /usr/local/bin/run.sh
 
 ENTRYPOINT [ "run.sh" ]
-# ENTRYPOINT [ "tail" ]
-# CMD [ "-f" ]
