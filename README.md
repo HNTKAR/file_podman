@@ -35,6 +35,9 @@ php-fpm
 |localtime|Asia/Tokyo|
 |socket|`/sock/mysql.sock`|
 |DB root password|password|`Dockerfile`にて設定|
+|nextcloud DB name|nextcloud_db|`nextcloud.sql`にて設定|
+|nextcloud DB user|nextcloud_user|`nextcloud.sql`にて設定|
+|nextcloud DB password|nextcloud_password|`nextcloud.sql`にて設定|
 
 ## postfix container
 メール配送
@@ -50,17 +53,6 @@ php-fpm
 |:-:|:-:|:-:|
 |localtime|Asia/Tokyo|
 |socket|`/sock/redis.sock`|
-
-## init container
-全てのコンテナが起動したあとの設定
-
-|名称|値|備考|
-|:-:|:-:|:-:|
-|localtime|Asia/Tokyo|
-|nextcloud DB name|nextcloud_db|`nextcloud.sql`にて設定|
-|nextcloud DB user|nextcloud_user|`nextcloud.sql`にて設定|
-|nextcloud DB password|nextcloud_password|`nextcloud.sql`にて設定|
-
 
 # 実行スクリプト
 
@@ -105,12 +97,22 @@ podman run --detach --replace --volumes-from file-nginx --pod file --name file-r
 podman build --tag file-postfix:$TagName --file postfix/Dockerfile .
 podman run --detach --replace --pod file --name file-postfix file-postfix:$TagName
 
-# initializer
-podman build --tag file-init:$TagName --file init/Dockerfile .
-podman run --detach --replace --volumes-from file-nginx --pod file --name file-init file-init:$TagName
 ```
 
 ## nextcloudの初期設定
+CUIまたはGUIによる初期設定を行う
+### [CUIによる設定](https://docs.nextcloud.com/server/27/admin_manual/installation/command_line_installation.html)
+以下を実行
+```bash
+ADMIN_NAME=admin
+ADMIN_PASS=password
+podman exec file-php occ maintenance:install \
+--database='mysql' --database-name='nextcloud_db' \
+--database-user='nextcloud_user' --database-pass='nextcloud_password' \
+--admin-user=$ADMIN_NAME --admin-pass=$ADMIN_PASS
+unset ADMIN_NAME ADMIN_PASS
+```
+### [GUIによる設定](https://docs.nextcloud.com/server/27/admin_manual/installation/installation_wizard.html)
 1. `https://192.168.100.100`にアクセス
 1. 以下の通り設定  
   ![setting](img/install.png)
@@ -146,4 +148,23 @@ xargs -n 1 sudo systemctl --user disable --now
 sed -e "s/.*\///g" tmp.service | \
 grep pod | \
 xargs -n 1 systemctl --user disable --now
+```
+
+# FAQ
+## `信頼できないドメインを介したアクセス`と表示された場合
+```bash
+# 現在の値の確認
+podman exec file-php occ config:system:get trusted_domains
+
+TRUSTED_DOMAIN="your IP or domain"
+#何個目のドメインとして登録するかを指定
+VAL=0
+
+podman exec file-php occ config:system:set trusted_domains $VAL --value $TRUSTED_DOMAIN
+```
+
+## [cronで更新を行いたい場合](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html)
+cronの設定ファイルに以下を追記
+```
+*/5 * * * * podman exec file-php php -f /var/www/nextcloud/cron.php
 ```
