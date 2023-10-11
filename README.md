@@ -117,18 +117,6 @@ unset ADMIN_NAME ADMIN_PASS
 1. 以下の通り設定  
   ![setting](img/install.png)
 
-## `信頼できないドメインを介したアクセス`と表示された場合
-```bash
-# 現在の値の確認
-podman exec file-php occ config:system:get trusted_domains
-
-TRUSTED_DOMAIN="your IP or domain"
-#何個目のドメインとして登録するかを指定
-VAL=0
-
-podman exec file-php occ config:system:set trusted_domains $VAL --value $TRUSTED_DOMAIN
-```
-
 ## 自動起動の設定
 ```sh
 # rootコンテナの場合
@@ -160,4 +148,23 @@ xargs -n 1 sudo systemctl --user disable --now
 sed -e "s/.*\///g" tmp.service | \
 grep pod | \
 xargs -n 1 systemctl --user disable --now
+```
+
+# FAQ
+## `信頼できないドメインを介したアクセス`と表示された場合
+```bash
+# 現在の値の確認
+podman exec file-php occ config:system:get trusted_domains
+
+TRUSTED_DOMAIN="your IP or domain"
+#何個目のドメインとして登録するかを指定
+VAL=0
+
+podman exec file-php occ config:system:set trusted_domains $VAL --value $TRUSTED_DOMAIN
+```
+
+## [cronで更新を行いたい場合](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html)
+cronの設定ファイルに以下を追記
+```
+*/5 * * * * podman exec file-php php -f /var/www/nextcloud/cron.php
 ```
