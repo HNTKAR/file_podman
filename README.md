@@ -119,15 +119,6 @@ unset ADMIN_NAME ADMIN_PASS
 
 ## 自動起動の設定
 ```sh
-# rootコンテナの場合
-sudo podman generate systemd -f -n --new --restart-policy=on-failure file >tmp.service
-cat tmp.service | \
-xargs -I {} sudo cp {} -frp /etc/systemd/system/
-sed -e "s/.*\///g" tmp.service | \
-grep pod | \
-xargs -n 1 sudo systemctl --now enable
-
-# rootlessコンテナの場合
 podman generate systemd -f -n --new --restart-policy=on-failure file >tmp.service
 mkdir -p ~/.config/systemd/user/
 cat tmp.service | \
@@ -139,12 +130,6 @@ xargs -n 1 systemctl --user enable --now
 
 ## 自動起動解除
 ```sh
-# rootコンテナの場合
-sed -e "s/.*\///g" tmp.service | \
-grep pod | \
-xargs -n 1 sudo systemctl --user disable --now
-
-# rootlessコンテナの場合
 sed -e "s/.*\///g" tmp.service | \
 grep pod | \
 xargs -n 1 systemctl --user disable --now
