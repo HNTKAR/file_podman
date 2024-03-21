@@ -1,32 +1,33 @@
-FROM php:8.2-fpm
+FROM php:8.3-fpm
 
-RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
-COPY ["php/php-fpm.conf","${PHP_INI_DIR}-fpm.d/zzz-php-fpm.conf"]
-COPY ["php/user.ini","${PHP_INI_DIR}/conf.d/"]
-COPY ["php/config.php.txt","/usr/local/src/"]
-COPY ["php/docker-run","/usr/local/bin/"]
+ENV TZ='Asia/Tokyo'
 
-RUN apt -y update && \
-    apt -y install \
-        ffmpeg \
-        libzip-dev \
-        libpng-dev \
-        libbz2-dev \
-        libicu-dev \
-        libc-client-dev \
-        libgmp-dev \
-        libsmbclient-dev \
-        libmagickwand-dev \
-        libkrb5-dev && \
+RUN apt update && \
+    apt install -y \
+    # ffmpeg \
+    # libreoffice\
+    sudo \
+    libzip-dev \
+    libpng-dev \
+    libicu-dev \
+    libgmp-dev \
+    libssl-dev \
+    libkrb5-dev \
+    libsmbclient-dev \
+    libmemcached-dev \
+    libmagickwand-dev \
+    libc-client2007e-dev && \
     apt clean
-RUN pecl install smbclient apcu redis imagick && \
-    docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
-    docker-php-ext-configure gd --with-freetype && \
-    docker-php-ext-install -j$(nproc) zip gd pdo_mysql bz2 intl imap bcmath gmp exif pcntl sysvsem opcache
-RUN ln -s /var/www/nextcloud/occ /usr/local/bin/occ && \
-    chmod 775 /usr/local/bin/docker-run 
 
-COPY ["php/user-ext.ini","${PHP_INI_DIR}/conf.d/"]
+RUN docker-php-ext-configure gd --with-freetype && \
+    docker-php-ext-install -j$(nproc) gd zip pdo_mysql intl ftp bcmath gmp exif pcntl && \
+    docker-php-ext-install -j$(nproc) opcache sysvsem && \
+    pecl install smbclient apcu redis memcached imap imagick && \
+    docker-php-ext-enable smbclient apcu redis memcached imap imagick
+
+COPY ["php-fpm.conf","${PHP_INI_DIR}-fpm.d/zzz-php-fpm.conf"]
+COPY ["user.ini","${PHP_INI_DIR}/conf.d/"]
+COPY ["init","/usr/local/bin/"]
+RUN chmod 777 /usr/local/bin/init
+
 WORKDIR /var/www
-
-CMD [ "docker-run" ]

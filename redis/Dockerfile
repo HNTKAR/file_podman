@@ -1,6 +1,7 @@
 FROM redis
 
-RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
-COPY ["redis/redis.conf","/usr/local/etc/redis/"]
+ENV TZ='Asia/Tokyo'
 
-CMD [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+COPY [ "redis.conf" , "/usr/local/etc/redis/redis.conf" ]
+
+CMD [ "redis-server" , "/usr/local/etc/redis/redis.conf" ]

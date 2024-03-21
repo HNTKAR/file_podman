@@ -97,6 +97,9 @@ podman run --detach --replace --volumes-from file-nginx --pod file --name file-r
 podman build --tag file-postfix:$TagName --file postfix/Dockerfile .
 podman run --detach --replace --pod file --name file-postfix file-postfix:$TagName
 
+# 初回起動時に以下を実行
+podman exec -it file-php init
+
 ```
 
 ## nextcloudの初期設定
