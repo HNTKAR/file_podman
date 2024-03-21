@@ -6,6 +6,7 @@ RUN apt update && \
     apt install -y \
     # ffmpeg \
     # libreoffice\
+    git \
     sudo \
     libzip-dev \
     libpng-dev \
@@ -21,8 +22,18 @@ RUN apt update && \
 
 RUN docker-php-ext-configure gd --with-freetype && \
     docker-php-ext-install -j$(nproc) gd zip pdo_mysql intl ftp bcmath gmp exif pcntl && \
-    docker-php-ext-install -j$(nproc) opcache sysvsem && \
-    pecl install smbclient apcu redis memcached imap imagick && \
+    docker-php-ext-install -j$(nproc) opcache sysvsem
+
+# https://qiita.com/imaiworks/items/7bbbd0a06507c383fa4b
+# https://github.com/Imagick/imagick
+RUN git clone https://github.com/Imagick/imagick && \
+    cd imagick && \
+    phpize && \
+    ./configure && \
+    make && \
+    make install
+
+RUN pecl install smbclient apcu redis memcached imap && \
     docker-php-ext-enable smbclient apcu redis memcached imap imagick
 
 COPY ["php-fpm.conf","${PHP_INI_DIR}-fpm.d/zzz-php-fpm.conf"]
