@@ -26,12 +26,12 @@ sudo firewall-cmd --reload
 # podman run -p 137:10137/udp -p 138:10138/udp -p 139:139/tcp -p 445:10445/tcp -it alpine:latest sh
 
 cd /Path/to/file_podman
-sudo cp Quadlet/* /etc/containers/systemd/
-sudo /usr/lib/systemd/system-generators/podman-system-generator
-sudo systemctl daemon-reload
+mkdir -p $HOME/.config/containers/systemd/
+cp Quadlet/* $HOME/.config/containers/systemd/
+systemctl --user daemon-reload
 
-sudo systemctl start podman_build_file
-sudo systemctl start podman_pod_file
+systemctl --user start podman_build_file
+systemctl --user start podman_pod_file
 ```
 
 # 補足
@@ -40,13 +40,13 @@ sudo systemctl start podman_pod_file
 cd Path/to/file_podman
 
 # Build Container
-podman build --tag samba --file samba/Dockerfile .
+podman build --tag file-samba --file samba/Dockerfile .
 
 # Creeate Pod
-podman pod create --replace --publish 10137-10138:137-138/udp --publish 10139:139/tcp --publish 10445:445/tcp --volume FILE:/usr/FILE --name FILE
+podman pod create --replace --publish 10137-10138:137-138/udp --publish 10139:139/tcp --publish 10445:445/tcp --volume file-volume:/usr/V --name file-pod
 
 # Start vpn-wireguard container
-podman run --pod FILE --name file-samba --detach --replace samba
+podman run --pod file-pod --name file-samba --detach --replace file-samba
 ```
 
 <!-- 
