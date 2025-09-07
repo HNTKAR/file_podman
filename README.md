@@ -17,20 +17,19 @@
 ## systemdを使用した起動の設定(自動起動有効化済み)
 ### 有効化
 ```sh
-sudo firewall-cmd --permanent --add-forward-port=port=137:proto=udp:toport=10137
-sudo firewall-cmd --permanent --add-forward-port=port=138:proto=udp:toport=10138
-sudo firewall-cmd --permanent --add-forward-port=port=139:proto=tcp:toport=10139
-sudo firewall-cmd --permanent --add-forward-port=port=445:proto=tcp:toport=10445
+sudo firewall-cmd --permanent --new-service=user-samba
+sudo firewall-cmd --permanent --service=user-samba --add-port=44445/tcp
+sudo firewall-cmd --permanent --service=user-samba --add-port=13139/tcp
+sudo firewall-cmd --permanent --service=user-samba --add-port=13137-13138/udp
+sudo firewall-cmd --permanent --add-service=user-samba
 sudo firewall-cmd --reload
-
-# podman run -p 137:10137/udp -p 138:10138/udp -p 139:139/tcp -p 445:10445/tcp -it alpine:latest sh
 
 cd /Path/to/file_podman
 mkdir -p $HOME/.config/containers/systemd/
 cp Quadlet/* $HOME/.config/containers/systemd/
 systemctl --user daemon-reload
 
-systemctl --user start podman_build_file
+systemctl --user start podman_build_file_samba
 systemctl --user start podman_pod_file
 ```
 
@@ -43,7 +42,7 @@ cd Path/to/file_podman
 podman build --tag file-samba --file samba/Dockerfile .
 
 # Creeate Pod
-podman pod create --replace --publish 10137-10138:137-138/udp --publish 10139:139/tcp --publish 10445:445/tcp --volume file-volume:/usr/V --name file-pod
+podman pod create --replace --publish 13137-13138:13137-13138/udp --publish 13139:13139/tcp --publish 13445:44445/tcp --volume file-volume:/usr/V --name file-pod
 
 # Start vpn-wireguard container
 podman run --pod file-pod --name file-samba --detach --replace file-samba
