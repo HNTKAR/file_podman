@@ -82,5 +82,6 @@ case $1 in
         ;;
 esac
 
-pdbedit -e tdbsam:/usr/V/$CONTAINER_NAME/db/pass_backup.db --configfile $CONF 2> /dev/null
+cat /etc/passwd > /usr/V/$CONTAINER_NAME/db/passwd.bak
+
 pdbedit -L --configfile $CONF

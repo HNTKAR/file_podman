@@ -19,6 +19,11 @@ pdbedit -i tdbsam:/usr/V/$CONTAINER_NAME/db/pass_backup.db --configfile $CONF 2>
 adduser -D sample
 echo -e "password\npassword"|pdbedit --create --password-from-stdin --user sample --configfile /etc/samba/smb-user.conf
 
+touch /usr/V/$CONTAINER_NAME/db/passwd.bak
+cat /usr/V/$CONTAINER_NAME/db/passwd.bak >> /etc/passwd
+sort -u -o /etc/passwd_sorted /etc/passwd
+sort -n -k 3 -t ":" -o /etc/passwd /etc/passwd_sorted
+
 nmbd
 touch /usr/V/$CONTAINER_NAME/conf/smb.conf
 smbd --configfile /etc/samba/smb-user.conf
