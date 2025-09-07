@@ -10,12 +10,12 @@ mkdir -p /usr/V/$CONTAINER_NAME/{conf,db,logs,share}
 chown $(id -u):$(id -u) -R /usr/V/$CONTAINER_NAME/{conf,db,logs}
 chmod 777 -R /usr/V/$CONTAINER_NAME/{conf,db,logs}
 
-adduser -D sample
-echo -e "password\npassword"|pdbedit --create --password-from-stdin  --user sample --configfile /etc/samba/smb-user.conf
-
 touch /usr/V/$CONTAINER_NAME/db/passdb.tdb
 unlink /etc/samba/passdb.tdb
 ln -s /usr/V/$CONTAINER_NAME/db/passdb.tdb /etc/samba/passdb.tdb
+
+adduser -D sample
+echo -e "password\npassword"|pdbedit --create --password-from-stdin  --user sample --configfile /etc/samba/smb-user.conf
 
 nmbd
 smbd --configfile /etc/samba/smb-user.conf
