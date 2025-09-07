@@ -14,10 +14,13 @@ touch /usr/V/$CONTAINER_NAME/db/passdb.tdb
 unlink /etc/samba/passdb.tdb
 ln -s /usr/V/$CONTAINER_NAME/db/passdb.tdb /etc/samba/passdb.tdb
 
+pdbedit -i tdbsam:/usr/V/$CONTAINER_NAME/db/pass_backup.db --configfile $CONF 2> /dev/null
+
 adduser -D sample
-echo -e "password\npassword"|pdbedit --create --password-from-stdin  --user sample --configfile /etc/samba/smb-user.conf
+echo -e "password\npassword"|pdbedit --create --password-from-stdin --user sample --configfile /etc/samba/smb-user.conf
 
 nmbd
+touch /usr/V/$CONTAINER_NAME/conf/smb.conf
 smbd --configfile /etc/samba/smb-user.conf
 
 sleep infinity &
