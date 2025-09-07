@@ -11,7 +11,7 @@ RUN ln -s /usr/share/zoneinfo/$TZ /etc/localtime
 
 RUN apk add bash tzdata samba
 
-COPY ["samba/run.sh", "/usr/local/bin/"]
+COPY ["samba/run.sh", "samba/smbuser", "/usr/local/bin/"]
 COPY ["samba/smb-user.conf", "/etc/samba/smb-user.conf"]
 RUN chmod +x /usr/local/bin/*
 

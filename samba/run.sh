@@ -14,7 +14,7 @@ adduser -D sample
 echo -e "password\npassword"|pdbedit --create --password-from-stdin  --user sample --configfile /etc/samba/smb-user.conf
 
 touch /usr/V/$CONTAINER_NAME/db/passdb.tdb
-rm -/etc/samba/passdb.tdb
+unlink /etc/samba/passdb.tdb
 ln -s /usr/V/$CONTAINER_NAME/db/passdb.tdb /etc/samba/passdb.tdb
 
 nmbd
