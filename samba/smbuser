@@ -4,7 +4,7 @@ smb_user=""
 smb_pass=""
 
 add_user() {
-    while getopts ":u:p:ha" OPT;do
+    while getopts ":u:p:h" OPT;do
         case $OPT in
             u) smb_user=$OPTARG;;
             p) smb_pass=$OPTARG;;
@@ -17,6 +17,17 @@ add_user() {
             exit;;
         esac
     done
+
+    if [ -z "$smb_user" ]; then
+        echo "Username is required"
+        exit 1
+    fi
+    
+    if [ -z "$smb_pass" ]; then
+        echo "Password is required"
+        exit 1
+    fi
+
     adduser -D $smb_user
     echo -e "$smb_pass\n$smb_pass"|\
         pdbedit --create --password-from-stdin \
@@ -39,11 +50,6 @@ rm_user() {
 
     if [ -z "$smb_user" ]; then
         echo "Username is required"
-        exit 1
-    fi
-    
-    if [ -z "$smb_pass" ]; then
-        echo "Password is required"
         exit 1
     fi
 
