@@ -6,6 +6,51 @@
 |:-:|:-:|:-:|
 |ポッド名|file|ポッド作成時に設定|
 
+## samba container
+|名称|値|備考|
+|:-:|:-:|:-:|
+|localtime|Asia/Tokyo||
+|net bios port|13137, 13138|smb-user.confに指定|
+|samba port|44445, 13139|smb-user.confに指定|
+
+
+# 実行スクリプト
+
+## systemdを使用した起動の設定(自動起動有効化済み)
+### 有効化
+```sh
+sudo firewall-cmd --permanent --new-service=user-samba
+sudo firewall-cmd --permanent --service=user-samba --add-port=44445/tcp
+sudo firewall-cmd --permanent --service=user-samba --add-port=13139/tcp
+sudo firewall-cmd --permanent --service=user-samba --add-port=13137-13138/udp
+sudo firewall-cmd --permanent --add-service=user-samba
+sudo firewall-cmd --reload
+
+cd /Path/to/file_podman
+mkdir -p $HOME/.config/containers/systemd/
+cp Quadlet/* $HOME/.config/containers/systemd/
+systemctl --user daemon-reload
+
+systemctl --user start podman_build_file_samba
+systemctl --user start podman_pod_file
+```
+
+# 補足
+## systemdを使用しない起動方法
+```bash
+cd Path/to/file_podman
+
+# Build Container
+podman build --tag file-samba --file samba/Dockerfile .
+
+# Creeate Pod
+podman pod create --replace --publish 13137-13138:13137-13138/udp --publish 13139:13139/tcp --publish 13445:44445/tcp --volume file-volume:/usr/V --name file-pod
+
+# Start vpn-wireguard container
+podman run --pod file-pod --name file-samba --detach --replace file-samba
+```
+
+<!-- 
 ## nginx container
 web
 |名称|値|備考|
@@ -156,3 +201,4 @@ cronの設定ファイルに以下を追記
 ```
 */5 * * * * podman exec file-php php -f /var/www/nextcloud/cron.php
 ```
+-->

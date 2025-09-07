@@ -1,0 +1,87 @@
+CONF="/etc/samba/smb-user.conf"
+
+smb_user=""
+smb_pass=""
+
+add_user() {
+    while getopts ":u:p:h" OPT;do
+        case $OPT in
+            u) smb_user=$OPTARG;;
+            p) smb_pass=$OPTARG;;
+            h) echo "Usage: $0 -u <username> -p <password> [-h]"
+               echo "  -u <username> : Username to add"
+               echo "  -p <password> : Password for the user"
+               echo "  -h            : Show this help message"
+               exit 0;;
+            *) echo "option Error: $OPT is not a valid option"
+            exit;;
+        esac
+    done
+
+    if [ -z "$smb_user" ]; then
+        echo "Username is required"
+        exit 1
+    fi
+    
+    if [ -z "$smb_pass" ]; then
+        echo "Password is required"
+        exit 1
+    fi
+
+    adduser -D $smb_user
+    echo -e "$smb_pass\n$smb_pass"|\
+        pdbedit --create --password-from-stdin \
+            --user $smb_user \
+            --configfile $CONF
+}
+
+rm_user() {
+    while getopts ":u:hp" OPT;do
+        case $OPT in
+            u) smb_user=$OPTARG;;
+            h) echo "Usage: $0 -u <username> [-h]"
+               echo "  -u <username> : Username to remove"
+               echo "  -h            : Show this help message"
+               exit 0;;
+            *) echo "option Error: $OPT is not a valid option"
+            exit;;
+        esac
+    done
+
+    if [ -z "$smb_user" ]; then
+        echo "Username is required"
+        exit 1
+    fi
+
+    pdbedit -x -u $smb_user --configfile $CONF
+    deluser --remove-home $smb_user
+}
+
+case $1 in
+    help)
+        echo "Usage: $0 [add|rm|show] [options]"
+        echo "  add : Add a user to the Samba server"
+        echo "  rm  : Remove a user from the Samba server"
+        echo "  show: Show current Samba configuration"
+        echo "  help: Show this help message"
+        exit 0
+        ;;
+    add)
+        shift
+        add_user "$@"
+        ;;
+    rm)
+        shift
+        rm_user "$@"
+        ;;
+    show)
+        ;;
+    *)
+        echo "Invalid option. Use 'help' for usage information."
+        exit 1
+        ;;
+esac
+
+cat /etc/passwd > /usr/V/$CONTAINER_NAME/db/passwd.bak
+
+pdbedit -L --configfile $CONF
