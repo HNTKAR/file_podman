@@ -9,6 +9,7 @@ trap "container_exit" SIGTERM
 mkdir -p /usr/V/$CONTAINER_NAME/{conf,db,logs,share}
 chown $(id -u):$(id -u) -R /usr/V/$CONTAINER_NAME/{conf,db,logs}
 chmod 777 -R /usr/V/$CONTAINER_NAME/{conf,db,logs}
+chmod 777 /usr/V/$CONTAINER_NAME/share
 
 touch /usr/V/$CONTAINER_NAME/db/passdb.tdb
 unlink /etc/samba/passdb.tdb
