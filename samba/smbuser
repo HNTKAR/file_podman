@@ -6,8 +6,8 @@ smb_pass=""
 add_user() {
     while getopts ":u:p:ha" OPT;do
         case $OPT in
-            u) user=$OPTARG;;
-            p) pass=$OPTARG;;
+            u) smb_user=$OPTARG;;
+            p) smb_pass=$OPTARG;;
             h) echo "Usage: $0 -u <username> -p <password> [-h]"
                echo "  -u <username> : Username to add"
                echo "  -p <password> : Password for the user"
@@ -17,7 +17,7 @@ add_user() {
             exit;;
         esac
     done
-    adduser -H -D $smb_user
+    adduser -D $smb_user
     echo -e "$smb_pass\n$smb_pass"|\
         pdbedit --create --password-from-stdin \
             --user $smb_user \
@@ -37,7 +37,7 @@ rm_user() {
         esac
     done
     pdbedit -x -u $smb_user --configfile $CONF
-    deluser $smb_user
+    deluser --remove-home $smb_user
 }
 
 case $1 in
