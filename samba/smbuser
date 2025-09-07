@@ -36,6 +36,17 @@ rm_user() {
             exit;;
         esac
     done
+
+    if [ -z "$smb_user" ]; then
+        echo "Username is required"
+        exit 1
+    fi
+    
+    if [ -z "$smb_pass" ]; then
+        echo "Password is required"
+        exit 1
+    fi
+
     pdbedit -x -u $smb_user --configfile $CONF
     deluser --remove-home $smb_user
 }
