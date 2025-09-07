@@ -10,6 +10,8 @@
 |名称|値|備考|
 |:-:|:-:|:-:|
 |localtime|Asia/Tokyo||
+|net bios port|13137, 13138|smb-user.confに指定|
+|samba port|44445, 13139|smb-user.confに指定|
 
 
 # 実行スクリプト
