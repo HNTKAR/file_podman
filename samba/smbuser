@@ -38,7 +38,7 @@ add_user() {
 rm_user() {
     while getopts ":u:hp" OPT;do
         case $OPT in
-            u) user=$OPTARG;;
+            u) smb_user=$OPTARG;;
             h) echo "Usage: $0 -u <username> [-h]"
                echo "  -u <username> : Username to remove"
                echo "  -h            : Show this help message"
@@ -82,4 +82,4 @@ case $1 in
         ;;
 esac
 
-pdbedit -L -s --configfile $CONF
+pdbedit -L --configfile $CONF
