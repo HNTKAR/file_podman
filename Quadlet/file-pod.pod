@@ -1,0 +1,11 @@
+[Pod]
+ServiceName=podman_pod_file
+PodName=file-pod
+PublishPort=137:10137/udp
+PublishPort=138:10138/udp
+PublishPort=139:10139/tcp
+PublishPort=445:10445/tcp
+Volume=file-volume.volume:/usr/V
+
+[Install]
+WantedBy=default.target

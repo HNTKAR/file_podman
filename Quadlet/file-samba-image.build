@@ -1,0 +1,8 @@
+[Service]
+Environment=REPO=HNTKAR
+[Build]
+ImageTag=file
+ServiceName=podman_build_file
+SetWorkingDirectory=https://github.com/${REPO}/file_podman.git
+#SetWorkingDirectory=https://github.com/${REPO}/file_podman.git#dev
+File=samba/Dockerfile
