@@ -3,6 +3,7 @@ FROM alpine
 ENV TZ='Asia/Tokyo'
 ENV POD_NAME="file-pod"
 ENV CONTAINER_NAME="file-samba"
+ENV CONF="/etc/samba/smb-user.conf"
 
 RUN apk update
 RUN apk upgrade

@@ -82,7 +82,7 @@ case $1 in
         ;;
 esac
 
-pdbedit -e /usr/V/$CONTAINER_NAME/db/passdb.tdb --configfile /etc/samba/smb-user.conf 2> /dev/null
+pdbedit -e tdbsam:/usr/V/$CONTAINER_NAME/db/passdb.tdb --configfile $CONF 2> /dev/null
 cat /etc/passwd > /usr/V/$CONTAINER_NAME/db/passwd.bak
 
 pdbedit -L --configfile $CONF
