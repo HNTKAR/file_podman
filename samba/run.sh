@@ -12,8 +12,7 @@ chmod 777 -R /usr/V/$CONTAINER_NAME/{conf,db,logs}
 chmod 777 /usr/V/$CONTAINER_NAME/share
 
 touch /usr/V/$CONTAINER_NAME/db/passdb.tdb
-unlink /etc/samba/passdb.tdb
-ln -s /usr/V/$CONTAINER_NAME/db/passdb.tdb /etc/samba/passdb.tdb
+pdbedit -i /usr/V/$CONTAINER_NAME/db/passdb.tdb --configfile /etc/samba/smb-user.conf 2> /dev/null
 
 pdbedit -i tdbsam:/usr/V/$CONTAINER_NAME/db/pass_backup.db --configfile $CONF 2> /dev/null
 
