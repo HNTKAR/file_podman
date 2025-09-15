@@ -11,11 +11,12 @@ chown $(id -u):$(id -u) -R /usr/V/$CONTAINER_NAME/{conf,db,logs}
 chmod 777 -R /usr/V/$CONTAINER_NAME/{conf,db,logs}
 chmod 777 /usr/V/$CONTAINER_NAME/share
 
+adduser -D sample
+echo -e "password\npassword"|pdbedit --create --password-from-stdin --user sample --configfile $CONF
+
 touch /usr/V/$CONTAINER_NAME/db/passdb.tdb
 pdbedit -i tdbsam:/usr/V/$CONTAINER_NAME/db/passdb.tdb --configfile $CONF 2> /dev/null
 
-adduser -D sample
-echo -e "password\npassword"|pdbedit --create --password-from-stdin --user sample --configfile $CONF
 
 touch /usr/V/$CONTAINER_NAME/db/passwd.bak
 cat /usr/V/$CONTAINER_NAME/db/passwd.bak >> /etc/passwd
