@@ -82,7 +82,7 @@ case $1 in
         ;;
 esac
 
-rm tdbsam:/usr/V/$CONTAINER_NAME/db/passdb.tdb
+rm /usr/V/$CONTAINER_NAME/db/passdb.tdb
 pdbedit -e tdbsam:/usr/V/$CONTAINER_NAME/db/passdb.tdb --configfile $CONF 2> /dev/null
 cat /etc/passwd > /usr/V/$CONTAINER_NAME/db/passwd.bak
 
