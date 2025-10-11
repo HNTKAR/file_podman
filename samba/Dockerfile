@@ -10,13 +10,13 @@ RUN apk upgrade
 
 RUN ln -s /usr/share/zoneinfo/$TZ /etc/localtime
 
-RUN apk add bash tzdata samba
-RUN addgroup -S samba && \
-    adduser -S -D -G samba sample
+RUN apk add bash tzdata samba tdb
+RUN addgroup samba
 
 COPY ["samba/run.sh", "samba/smbuser", "/usr/local/bin/"]
 COPY ["samba/smb-user.conf", "/etc/samba/smb-user.conf"]
 RUN chmod +x /usr/local/bin/*
 
+RUN chmod 777 -R /usr/local/share/
+
 ENTRYPOINT ["/usr/local/bin/run.sh"]
-# ENTRYPOINT ["tail", "-f", "/dev/null"]

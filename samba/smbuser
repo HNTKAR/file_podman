@@ -28,7 +28,7 @@ add_user() {
         exit 1
     fi
 
-    adduser -D -S -G samba $smb_user
+    adduser -D -G samba -s /sbin/nologin $smb_user
     echo -e "$smb_pass\n$smb_pass"|\
         pdbedit --create --password-from-stdin \
             --user $smb_user \
@@ -82,10 +82,8 @@ case $1 in
         ;;
 esac
 
-rm /usr/V/$CONTAINER_NAME/db/passdb.tdb
-# pdbedit -e tdbsam:/usr/V/$CONTAINER_NAME/db/passdb.tdb --configfile $CONF 2> /dev/null
-cp /etc/passwd /usr/V/$CONTAINER_NAME/db/passwd.bak
-cp /etc/group /usr/V/$CONTAINER_NAME/db/group.bak
-cp /etc/samba/passdb.tdb /usr/V/$CONTAINER_NAME/db/passdb.tdb.bak
+grep "/home/" /etc/passwd > /V/db/passwd.bak
+tdbbackup /usr/local/lib/passdb.tdb
+cp /usr/local/lib/passdb.tdb.bak /V/db/passdb.tdb
 
 pdbedit -L --configfile $CONF

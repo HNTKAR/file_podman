@@ -6,33 +6,23 @@ container_exit() {
 
 trap "container_exit" SIGTERM
 
-mkdir -p /usr/V/$CONTAINER_NAME/{conf,db,logs,share}
-chown $(id -u):$(id -u) -R /usr/V/$CONTAINER_NAME/{conf,db,logs}
-chmod 777 -R /usr/V/$CONTAINER_NAME/{conf,db,logs}
-chmod 777 /usr/V/$CONTAINER_NAME/share
+mkdir -p /V/{conf,db,logs}
+chown $(id -u):$(id -u) -R /V/{conf,db,logs}
+chmod 777 -R /V/{conf,db,logs}
 
-if [ -f "/usr/V/$CONTAINER_NAME/db/passwd.bak" ]; then
-    sed -i -e "/home/d" /etc/passwd
-    grep "home" /usr/V/$CONTAINER_NAME/db/passwd.bak >> /etc/passwd
+if [ -f /V/db/passwd.bak ]; then
+    sed -i -e "/\/home\//d" /etc/passwd
+    while IFS=: read -r user pass uid other; do
+        adduser -D -u "$uid" -G samba -s /sbin/nologin "$user"
+    done < /V/db/passwd.bak
 fi
 
-if [ -f "/usr/V/$CONTAINER_NAME/db/group.bak" ]; then
-    sed -i -e "/sample/d" /etc/group
-    grep "samba" /usr/V/$CONTAINER_NAME/db/group.bak >> /etc/group
+if [ -f /V/db/passdb.tdb ]; then
+    cp /V/db/passdb.tdb /usr/local/lib/passdb.tdb
 fi
-
-if [ -f "/usr/V/$CONTAINER_NAME/db/passdb.tdb.bak" ]; then
-    rm /etc/samba/passdb.tdb
-    cp /usr/V/$CONTAINER_NAME/db/passdb.tdb.bak /etc/samba/passdb.tdb
-fi
-
-echo -e "password\npassword"|pdbedit --create --password-from-stdin --user sample --configfile $CONF
-
-touch /usr/V/$CONTAINER_NAME/db/passdb.tdb
-# pdbedit -i tdbsam:/usr/V/$CONTAINER_NAME/db/passdb.tdb --configfile $CONF 2> /dev/null
 
 nmbd
-touch /usr/V/$CONTAINER_NAME/conf/smb.conf
+touch /V/conf/smb.conf
 smbd --configfile $CONF
 
 sleep infinity &
