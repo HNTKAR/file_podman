@@ -6,27 +6,24 @@ container_exit() {
 
 trap "container_exit" SIGTERM
 
-mkdir -p /usr/V/$CONTAINER_NAME/{conf,db,logs,share}
-chown $(id -u):$(id -u) -R /usr/V/$CONTAINER_NAME/{conf,db,logs}
-chmod 777 -R /usr/V/$CONTAINER_NAME/{conf,db,logs}
+mkdir -p /V/{conf,db,logs}
+chown $(id -u):$(id -u) -R /V/{conf,db,logs}
+chmod 777 -R /V/{conf,db,logs}
 
-touch /usr/V/$CONTAINER_NAME/db/passdb.tdb
-unlink /etc/samba/passdb.tdb
-ln -s /usr/V/$CONTAINER_NAME/db/passdb.tdb /etc/samba/passdb.tdb
+if [ -f /V/db/passwd.bak ]; then
+    sed -i -e "/\/home\//d" /etc/passwd
+    while IFS=: read -r user pass uid other; do
+        adduser -D -u "$uid" -G samba -s /sbin/nologin "$user"
+    done < /V/db/passwd.bak
+fi
 
-pdbedit -i tdbsam:/usr/V/$CONTAINER_NAME/db/pass_backup.db --configfile $CONF 2> /dev/null
-
-adduser -D sample
-echo -e "password\npassword"|pdbedit --create --password-from-stdin --user sample --configfile /etc/samba/smb-user.conf
-
-touch /usr/V/$CONTAINER_NAME/db/passwd.bak
-cat /usr/V/$CONTAINER_NAME/db/passwd.bak >> /etc/passwd
-sort -u -o /etc/passwd_sorted /etc/passwd
-sort -n -k 3 -t ":" -o /etc/passwd /etc/passwd_sorted
+if [ -f /V/db/passdb.tdb ]; then
+    cp /V/db/passdb.tdb /usr/local/lib/passdb.tdb
+fi
 
 nmbd
-touch /usr/V/$CONTAINER_NAME/conf/smb.conf
-smbd --configfile /etc/samba/smb-user.conf
+touch /V/conf/smb.conf
+smbd --configfile $CONF
 
 sleep infinity &
 wait $!
