@@ -25,6 +25,6 @@ nmbd
 touch /V/conf/smb.conf
 smbd --configfile $CONF
 
-sleep infinity &
+tail -F /var/log/samba/smb.log &
 wait $!
 container_exit
