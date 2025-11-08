@@ -1,3 +1,6 @@
+[Install]
+WantedBy=default.target
+
 [Pod]
 ServiceName=podman_pod_file
 PodName=file-pod
@@ -5,7 +8,3 @@ PublishPort=13137:13137/udp
 PublishPort=13138:13138/udp
 PublishPort=13139:13139/tcp
 PublishPort=44445:44445/tcp
-Volume=file-volume.volume:/V
-
-[Install]
-WantedBy=default.target
