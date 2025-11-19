@@ -13,41 +13,58 @@
 |net bios port|13137, 13138|smb-user.confに指定|
 |samba port|44445, 13139|smb-user.confに指定|
 
+## nginx container
+web
+|名称|値|備考|
+|:-:|:-:|:-:|
+|localtime|Asia/Tokyo|
+|port|8080|
+
 
 # 実行スクリプト
-
-## systemdを使用した起動の設定(自動起動有効化済み)
-### 有効化
+## 共通
 ```sh
 sudo firewall-cmd --permanent --new-service=user-samba
 sudo firewall-cmd --permanent --service=user-samba --add-port=44445/tcp
 sudo firewall-cmd --permanent --service=user-samba --add-port=13139/tcp
 sudo firewall-cmd --permanent --service=user-samba --add-port=13137-13138/udp
 sudo firewall-cmd --permanent --add-service=user-samba
-sudo firewall-cmd --reload
 
+sudo firewall-cmd --permanent --new-service=user-nginx
+sudo firewall-cmd --permanent --service=user-nginx --add-port=44443/tcp
+sudo firewall-cmd --permanent --service=user-nginx --add-port=58080/tcp
+sudo firewall-cmd --permanent --add-service=user-nginx
+
+sudo firewall-cmd --reload
+```
+
+## systemdを使用した起動の設定(自動起動有効化済み)
+### 有効化
+```sh
 cd /Path/to/file_podman
 mkdir -p $HOME/.config/containers/systemd/
 cp Quadlet/* $HOME/.config/containers/systemd/
 systemctl --user daemon-reload
 
 systemctl --user start podman_build_file_samba
+systemctl --user start podman_build_file_nginx
 systemctl --user start podman_pod_file
 ```
 
-# 補足
 ## systemdを使用しない起動方法
 ```bash
 cd Path/to/file_podman
 
 # Build Container
 podman build --tag file-samba --file samba/Dockerfile .
+podman build --tag file-nginx --file nginx/Dockerfile .
 
 # Creeate Pod
-podman pod create --replace --publish 13137-13138:13137-13138/udp --publish 13139:13139/tcp --publish 13445:44445/tcp --volume file-volume:/usr/V --name file-pod
+podman pod create --replace --publish 13137-13138:13137-13138/udp --publish 13139:13139/tcp --publish 44445:44445/tcp --publish 44443:44443/tcp --publish 58080:58080/tcp --name file-pod
 
-# Start vpn-wireguard container
-podman run --pod file-pod --name file-samba --detach --replace file-samba
+# Start file-samba container
+podman run --pod file-pod --name file-samba --mount type=volume,source=file-volume,destination=/V --detach --replace file-samba
+podman run --pod file-pod --name file-nginx --detach --replace file-nginx
 ```
 
 <!-- 

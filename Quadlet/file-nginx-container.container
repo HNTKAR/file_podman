@@ -1,0 +1,6 @@
+[Container]
+ServiceName=podman_container_file_nginx
+ContainerName=file-nginx
+Image=localhost/file-nginx
+Pod=file-pod.pod
+AutoUpdate=local

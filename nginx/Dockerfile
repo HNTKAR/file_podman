@@ -1,8 +1,13 @@
 FROM nginx:mainline
 
-ARG CONFIG_FILE="https://raw.githubusercontent.com/nextcloud/documentation/master/admin_manual/installation/nginx-root.conf.sample"
 ENV TZ='Asia/Tokyo'
 
-VOLUME [ "/sock" ]
+RUN apt -y update &&\
+        apt -y upgrade
 
-ADD ["${CONFIG_FILE}" ,"/etc/nginx/conf.d/nextcloud.conf"]
+RUN ln -fs /usr/share/zoneinfo/$TZ /etc/localtime
+
+COPY ["nginx/run.sh", "/usr/local/bin/"]
+RUN chmod +x /usr/local/bin/*
+
+ENTRYPOINT ["/usr/local/bin/run.sh"]
