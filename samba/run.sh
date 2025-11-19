@@ -22,7 +22,7 @@ if [ -f /V/db/passdb.tdb ]; then
 fi
 
 nmbd
-touch /V/conf/smb.conf /etc/samba/smb-include.conf
+touch /V/conf/smb.conf
 smbd --configfile $CONF
 
 tail -F /var/log/samba/smb.log &
