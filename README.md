@@ -64,7 +64,7 @@ podman pod create --replace --publish 13137-13138:13137-13138/udp --publish 1313
 
 # Start file-samba container
 podman run --pod file-pod --name file-samba --mount type=volume,source=file-volume,destination=/V --detach --replace file-samba
-podman run --pod file-pod --name file-nginx --detach --replace file-nginx
+podman run --pod file-pod --name file-nginx --mount type=volume,source=file-volume,destination=/V --detach --replace file-nginx
 ```
 
 <!-- 
