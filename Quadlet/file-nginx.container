@@ -2,6 +2,6 @@
 ServiceName=podman_container_file_nginx
 ContainerName=file-nginx
 Image=localhost/file-nginx
-Pod=file-pod.pod
+Pod=file.pod
 AutoUpdate=local
-Mount=type=volume,source=file-nginx-volume.volume,destination=/V
+Mount=type=volume,source=file-nginx.volume,destination=/V

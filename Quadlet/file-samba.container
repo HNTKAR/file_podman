@@ -4,4 +4,4 @@ ContainerName=file-samba
 Image=localhost/file-samba
 Pod=file-pod.pod
 AutoUpdate=local
-Mount=type=volume,source=file-samba-volume.volume,destination=/V
+Mount=type=volume,source=file-samba.volume,destination=/V

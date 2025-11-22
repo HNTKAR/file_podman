@@ -1,0 +1,5 @@
+*
+!.gitignore
+!h-_.conf
+!nginx-user.conf
+!s-root.conf
