@@ -1,17 +1,12 @@
 #!/bin/bash
 
-container_exit() {
-    exit 0
-}
+mkdir -p /V/{conf,logs,sites}
+cp /usr/local/share/sites/* /V/sites/
+chown $(id -u nginx):$(id -u nginx) -R /V/{conf,logs}
+chmod 777 -R /V/{conf,logs}
 
-trap "container_exit" SIGTERM
+touch /V/logs/access.log /V/logs/error.log /V/conf/nginx.conf
+tail -F /V/logs/error.log &
+tail -F /V/logs/access.log &
 
-mkdir -p /V/{conf,db,logs}
-chown $(id -u):$(id -u) -R /V/{conf,db,logs}
-chmod 777 -R /V/{conf,db,logs}
-
-nginx -g 'daemon off;'
-
-tail -F /var/log/nginx/error.log &
-wait $!
-container_exit
+exec nginx -g 'daemon off;' -c /etc/nginx/nginx-user.conf

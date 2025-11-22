@@ -4,3 +4,4 @@ ContainerName=file-nginx
 Image=localhost/file-nginx
 Pod=file-pod.pod
 AutoUpdate=local
+Mount=type=volume,source=file-nginx-volume.volume,destination=/V

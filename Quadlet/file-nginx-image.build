@@ -4,4 +4,5 @@ Environment=REPO=HNTKAR
 ImageTag=file-nginx
 ServiceName=podman_build_file-nginx
 SetWorkingDirectory=https://github.com/${REPO}/vpn_podman.git
-File=wireguard/Dockerfile
+File=nginx/Dockerfile
+Mount=type=volume,source=file-volume.volume,destination=/V

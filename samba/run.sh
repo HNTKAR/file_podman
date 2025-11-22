@@ -1,11 +1,5 @@
 #!/bin/bash
 
-container_exit() {
-    exit 0
-}
-
-trap "container_exit" SIGTERM
-
 mkdir -p /V/{conf,db,logs}
 chown $(id -u):$(id -u) -R /V/{conf,db,logs}
 chmod 777 -R /V/{conf,db,logs}
@@ -22,9 +16,6 @@ if [ -f /V/db/passdb.tdb ]; then
 fi
 
 nmbd
-touch /V/conf/smb.conf
-smbd --configfile $CONF
-
+touch /V/conf/smb.conf /var/log/samba/smb.log
 tail -F /var/log/samba/smb.log &
-wait $!
-container_exit
+exec smbd --configfile $CONF --no-process-group --foreground
