@@ -1,0 +1,4 @@
+types {
+    audio/wav  wav;
+    audio/x-wav wav;
+}
