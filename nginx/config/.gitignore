@@ -1,6 +1,9 @@
-*
+*.conf
 !.gitignore
 !h-_.conf
+!h-_-ssl.conf
 !nginx-user.conf
 !s-root.conf
+!ssl-s-root.conf
 !*.types
+!*.config
