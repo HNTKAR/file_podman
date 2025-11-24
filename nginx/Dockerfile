@@ -1,6 +1,8 @@
 FROM nginx:mainline
 
+ARG P12_PASS="password"
 ENV TZ='Asia/Tokyo'
+ENV CERT_DIR="/usr/local/share/mtls"
 
 RUN apt -y update &&\
         apt -y upgrade
@@ -10,20 +12,18 @@ RUN ln -fs /usr/share/zoneinfo/$TZ /etc/localtime
 RUN groupadd samba &&\
         usermod -aG samba nginx
 
-RUN mkdir -p /etc/nginx/mtls
+RUN mkdir -p /usr/local/share/mtls
 # CA証明書を作成
-RUN openssl req -x509 -newkey rsa:2048 -keyout /etc/nginx/mtls/ca.key -noenc -out /etc/nginx/mtls/ca.crt -subj="/C=JP/CN=CA/O=local CA"
-# RUN openssl req -x509 -newkey Ed25519 -keyout /etc/nginx/mtls/ca.key -noenc -out /etc/nginx/mtls/ca.crt -subj="/C=JP/CN=CA/O=local CA"
+RUN openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -keyout ${CERT_DIR}/ca.key -noenc -out ${CERT_DIR}/ca.crt -subj="/C=JP/CN=CA"
 
 # サーバー証明書を作成
-COPY ["nginx/config/extfile.ini", "/etc/nginx/mtls/"]
-RUN openssl req -noenc -newkey rsa:2048 -keyout /etc/nginx/mtls/server.key -out /etc/nginx/mtls/server.csr -subj "/C=JP/CN=server" &&\
-        openssl x509 -req -extfile /etc/nginx/mtls/extfile.ini -extensions v3_req -CA /etc/nginx/mtls/ca.crt -CAkey /etc/nginx/mtls/ca.key -in /etc/nginx/mtls/server.csr -out /etc/nginx/mtls/server.crt
+RUN openssl req -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -keyout ${CERT_DIR}/server.key -noenc -out ${CERT_DIR}/server.csr -subj "/C=JP/CN=server" &&\
+        openssl x509 -req -CA ${CERT_DIR}/ca.crt -CAkey ${CERT_DIR}/ca.key -in ${CERT_DIR}/server.csr -out ${CERT_DIR}/server.crt
 
 # クライアント証明書を作成
-RUN openssl req -noenc -newkey rsa:2048 -keyout /etc/nginx/mtls/client.key -out /etc/nginx/mtls/client.csr -subj "/C=JP/CN=user" &&\
-        openssl x509 -req -CA /etc/nginx/mtls/ca.crt -CAkey /etc/nginx/mtls/ca.key -in /etc/nginx/mtls/client.csr -out /etc/nginx/mtls/client.crt &&\
-        openssl pkcs12 -export -inkey /etc/nginx/mtls/client.key -in /etc/nginx/mtls/client.crt -certfile /etc/nginx/mtls/ca.crt -name "user" -out /etc/nginx/mtls/user.p12 -passout pass:"password"
+RUN openssl req -noenc -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -keyout ${CERT_DIR}/client.key -out ${CERT_DIR}/client.csr -subj "/C=JP/CN=client" &&\
+        openssl x509 -req -CA ${CERT_DIR}/ca.crt -CAkey ${CERT_DIR}/ca.key -in ${CERT_DIR}/client.csr -out ${CERT_DIR}/client.crt &&\
+        openssl pkcs12 -export -inkey ${CERT_DIR}/client.key -in ${CERT_DIR}/client.crt -certfile ${CERT_DIR}/ca.crt -out ${CERT_DIR}/client.p12 -passout pass:"${P12_PASS}"
 
 COPY ["nginx/config/mime-append.types", "/etc/nginx/mime-append.types"]
 
@@ -32,7 +32,7 @@ RUN mv /usr/local/lib/conf/nginx-user.conf /etc/nginx/nginx-user.conf
 
 COPY ["nginx/sites", "/usr/local/share/sites/"]
 
-COPY ["nginx/run.sh", "/usr/local/bin/"]
+COPY ["nginx/run.sh","nginx/certmgr", "/usr/local/bin/"]
 RUN chmod +x /usr/local/bin/*
 
 ENTRYPOINT ["/usr/local/bin/run.sh"]

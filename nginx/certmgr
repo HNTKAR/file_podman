@@ -1,0 +1,65 @@
+#!/bin/bash
+CONF="/etc/samba/smb-user.conf"
+
+subj="/C=JP/CN=client"
+p12_pass=""
+output_dir="/V/cert"
+input_dir=$CERT_DIR
+name="certmgr"
+days=365
+
+create_key() {
+
+    while getopts ":s:p:i:o:n:d:h" OPT;do
+        case $OPT in
+            s)  subj=$OPTARG;;
+            p)  p12_pass=$OPTARG;;
+            i)  input_dir=$OPTARG;;
+            o)  output_dir=$OPTARG;;
+            n)  name=$OPTARG;;
+            d)  days=$OPTARG;;
+            h)  echo "Usage: $0 -k <key_path> [-h]"
+                echo "  -k <key_path> : Path to save the generated key"
+                echo "  -s <subject>  : Subject for the certificate (default: /C=JP/CN=client)"
+                echo "  -p <password> : Password for the PKCS#12 file"
+                echo "  -i <input_dir>: Input directory for CA files (default: $CERT_DIR)"
+                echo "  -o <output_dir>: Output directory for generated files (default: /V/cert)"
+                echo "  -n <name>     : Base name for the generated files (default: certmgr)"
+                echo "  -d <days>     : Validity period in days (default: 365)"
+                echo "  -h            : Show this help message"
+                exit 0;;
+            *) echo "option Error: $OPT is not a valid option"
+            exit;;
+        esac
+    done
+
+    if [ -z "$p12_pass" ]; then
+        echo "password is required"
+        exit 1
+    fi
+
+    mkdir -p $output_dir
+    
+    openssl req -noenc -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -keyout $output_dir/$name.key -out $output_dir/$name.csr -subj $subj
+    openssl x509 -req -CA $input_dir/ca.crt -CAkey $input_dir/ca.key -in $output_dir/$name.csr -out $output_dir/$name.crt -days $days -sha256
+    openssl pkcs12 -export -inkey $output_dir/$name.key -in $output_dir/$name.crt -certfile $input_dir/ca.crt -out $output_dir/$name.p12 -passout pass:$p12_pass
+
+}
+
+case $1 in
+    help)
+        echo "Usage: $0 <command> [options]"
+        echo "Commands:"
+        echo "  create    Create a new key and certificate"
+        echo "  help      Show this help message"
+        exit 0
+        ;;
+    create)
+        shift
+        create_key "$@"
+        ;;
+    *)
+        echo "Invalid option. Use 'help' for usage information."
+        exit 1
+        ;;
+esac

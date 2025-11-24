@@ -1,3 +1,4 @@
+#!/bin/bash
 CONF="/etc/samba/smb-user.conf"
 
 smb_user=""
