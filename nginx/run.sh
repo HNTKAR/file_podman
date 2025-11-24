@@ -9,12 +9,14 @@ if [ -f /V/cert/status ]; then
         echo "certificates found."
 else
         echo "certificates not found. Copy default certs."
-        cp $CERT_DIR/* /V/cert/
+        cp -r $CERT_DIR/* /V/cert/
         echo "$(date) certificates copied from $CERT_DIR to /V/cert" > /V/cert/status
 fi
 
 touch /V/logs/access.log /V/logs/error.log /V/conf/nginx.conf
 tail -F /V/logs/error.log &
 tail -F /V/logs/access.log &
+
+# tail -F /dev/null
 
 exec nginx -c /etc/nginx/nginx-user.conf -g 'daemon off;'

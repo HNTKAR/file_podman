@@ -12,19 +12,6 @@ RUN ln -fs /usr/share/zoneinfo/$TZ /etc/localtime
 RUN groupadd samba &&\
         usermod -aG samba nginx
 
-RUN mkdir -p /usr/local/share/mtls
-# CA証明書を作成
-RUN openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -keyout ${CERT_DIR}/ca.key -noenc -out ${CERT_DIR}/ca.crt -subj="/C=JP/CN=CA"
-
-# サーバー証明書を作成
-RUN openssl req -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -keyout ${CERT_DIR}/server.key -noenc -out ${CERT_DIR}/server.csr -subj "/C=JP/CN=server" &&\
-        openssl x509 -req -CA ${CERT_DIR}/ca.crt -CAkey ${CERT_DIR}/ca.key -in ${CERT_DIR}/server.csr -out ${CERT_DIR}/server.crt
-
-# クライアント証明書を作成
-RUN openssl req -noenc -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -keyout ${CERT_DIR}/client.key -out ${CERT_DIR}/client.csr -subj "/C=JP/CN=client" &&\
-        openssl x509 -req -CA ${CERT_DIR}/ca.crt -CAkey ${CERT_DIR}/ca.key -in ${CERT_DIR}/client.csr -out ${CERT_DIR}/client.crt &&\
-        openssl pkcs12 -export -inkey ${CERT_DIR}/client.key -in ${CERT_DIR}/client.crt -certfile ${CERT_DIR}/ca.crt -out ${CERT_DIR}/client.p12 -passout pass:"${P12_PASS}"
-
 COPY ["nginx/config/mime-append.types", "/etc/nginx/mime-append.types"]
 
 COPY ["nginx/config/*.conf", "/usr/local/lib/conf/"]
@@ -35,4 +22,25 @@ COPY ["nginx/sites", "/usr/local/share/sites/"]
 COPY ["nginx/run.sh","nginx/certmgr", "/usr/local/bin/"]
 RUN chmod +x /usr/local/bin/*
 
+COPY ["nginx/config/openssl-append.ini", "/usr/lib/openssl.cnf"]
+
+RUN cat /usr/lib/openssl.cnf >> /usr/lib/ssl/openssl.cnf
+
+RUN mkdir -p ${CERT_DIR}
+
+# CA証明書を作成
+RUN openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:secp384r1 -keyout ${CERT_DIR}/ca.key -noenc -out ${CERT_DIR}/ca.crt -subj="/CN=CA"
+
+# サーバー証明書を作成
+RUN certmgr create -p ${P12_PASS} -c ${CERT_DIR} -o ${CERT_DIR} -s "/C=JP/ST=City/O=Org/CN=server" -d 365 -n "server"
+
+
+# クライアント証明書を作成
+RUN certmgr create -p ${P12_PASS} -c ${CERT_DIR} -o ${CERT_DIR} -s "/C=JP/ST=City/O=Org/CN=client" -d 365 -n "client"
+
+# CRLを作成
+WORKDIR ${CERT_DIR}
+RUN openssl ca -gencrl -keyfile ${CERT_DIR}/ca.key -cert ${CERT_DIR}/ca.crt -out ${CERT_DIR}/crl.pem
+
+WORKDIR /
 ENTRYPOINT ["/usr/local/bin/run.sh"]
